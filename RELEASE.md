@@ -2,7 +2,7 @@
 
 ## Status, 2026-11-12
 
-Source release prepared for public publication as `hlassige/RugPool-NEAR-Hackathon`. A hosted demo and separate testnet deployment remain pending. No mainnet deployment or real Intents delivery is claimed. No tests, builds, installs, network access or signing were performed during the original packaging step. Publication uses GitHub separately; prior passes are retained, not rerun or renamed acceptance tests.
+Source release prepared for public publication as `trustware-io/RugPool-NEAR-Hackathon`. A hosted demo and separate testnet deployment remain pending. No mainnet deployment or real Intents delivery is claimed. No tests, builds, installs, network access or signing were performed during the original packaging step. Publication uses GitHub separately; prior passes are retained, not rerun or renamed acceptance tests.
 
 Prior independent evidence recorded November 11–12: frontend 182 tests/typecheck/build; 117 RugPool unit plus 2 token tests; keeper 44 doctests and 10 exit tests; selected local-chain regressions, 15 caught mutations and local-chain E2E; four separately run live-drand tests; scoped draw-storage review; nine synthetic keeper command-boundary cases. Local E2E substitutes identity and wallet keys, not live Privy/email. Gas at 500 depositors is extrapolated from 10/70, not an executed 500-player run.
 
