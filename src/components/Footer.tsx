@@ -1,48 +1,86 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { money } from '../state/format'
 import { useGame } from '../state/GameContext'
-import { contractId, fastMode, mockControls, withdrawCooldownLabel } from '../state/services'
+import { contractId, fastMode, mockControls } from '../state/services'
+import { Modal } from './modals/Modal'
 
 export function Footer() {
   const { state } = useGame()
   const controls = mockControls
   const [bots, setBots] = useState(controls?.botsOn() ?? false)
+  const [rulesOpen, setRulesOpen] = useState(false)
+  const rulesOpener = useRef<HTMLButtonElement>(null)
+  const wasRulesOpen = useRef(false)
+  useEffect(() => {
+    // Conditional dialog removal can precede native focus restoration.
+    if (wasRulesOpen.current && !rulesOpen) rulesOpener.current?.focus()
+    wasRulesOpen.current = rulesOpen
+  }, [rulesOpen])
   const p = state?.params
   const s = (ms: number) => (ms >= 60_000 && ms % 60_000 === 0 ? `${ms / 60_000} min` : `${ms / 1000}s`)
 
   return (
-    <footer className="foot">
+    <footer className="foot" onKeyDown={(event) => {
+      const dialog = rulesOpen ? event.currentTarget.querySelector<HTMLDialogElement>('dialog:modal') : null
+      if (dialog && ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End'].includes(event.key)) {
+        event.preventDefault()
+        const step = event.key.startsWith('Page') ? dialog.clientHeight * 0.8 : 40
+        if (event.key === 'Home') dialog.scrollTop = 0
+        else if (event.key === 'End') dialog.scrollTop = dialog.scrollHeight
+        else dialog.scrollTop += ['ArrowUp', 'PageUp'].includes(event.key) ? -step : step
+      }
+      if (rulesOpen && event.key === 'Tab') {
+        // Rules are read-only; Close is the only focusable dialog control.
+        const close = event.currentTarget.querySelector<HTMLButtonElement>('dialog:modal .x')
+        if (close) {
+          event.preventDefault()
+          close.focus()
+        }
+      }
+    }}>
       <p className="powered">Deposits powered by Trustware</p>
       <p className="muted small">{contractId ? `Contract: ${contractId} (NEAR testnet rehearsal) · Direct tUSDC deposits` : 'Contract: rugpool.testnet (mock) · Settled on NEAR via NEAR Intents'}</p>
-      {p && (
-        <details className="rules">
-          <summary>Rules</summary>
-          <ul>
-            <li>
-              The first challenge costs {money(p.start_price)}. Each challenge adds {p.step_bps / 100}%. The price resets every round.
-            </li>
-            <li>
-              Every ticket splits {p.split_bps.map((b) => b / 100).join(' / ')}: Jackpot, the King you dethrone, the Court, the protocol.
-            </li>
-            <li>
-              No early end. The showdown starts when the Jackpot reaches {fastMode ? money(state?.round.showdown_trigger ?? '0') : '0.2% of the Court'} or the round is {fastMode ? '5 min' : '6h'} old. It runs {s(p.showdown_ms)}; a challenge in the last {s(p.snipe_ms)} pushes the end back to {s(p.snipe_ms)}.
-            </li>
-            <li>Auto-defend retakes the throne for you in the same transaction, up to your max price, with at most 25 retakes per transaction.</li>
-            <li>
-              You need {money(p.min_court)} in the Court to challenge. The Court deposit is refundable after a {withdrawCooldownLabel} cooldown, earns yield plus fees, and enters the draw without spending your Court principal. Funds remain exposed to contract, token, storage and operator risks.
-            </li>
-          </ul>
-        </details>
+      {state && p && (
+        <>
+          <button ref={rulesOpener} type="button" className="btn-line rules-opener" aria-haspopup="dialog" onClick={(event) => {
+            // Establish the opener for pointer and keyboard interactions.
+            event.currentTarget.focus()
+            setRulesOpen(true)
+          }}>
+            Rules & instructions
+          </button>
+          {rulesOpen && (
+            <Modal title="Rules & instructions" onClose={() => setRulesOpen(false)}>
+              <div className="rules-content">
+                <p>Sign in, deposit funds, then join the Court before challenging. Review the current price before confirming a challenge. The last King standing wins the Jackpot when the round settles.</p>
+                <p className="muted small">{contractId ? 'Values below come from the connected game state.' : 'Mock mode: values below describe this local simulation, not a deployed game.'}</p>
+                <ul>
+                  <li>The first challenge costs {money(p.start_price)}. Each challenge adds {p.step_bps / 100}%. The price resets every round.</li>
+                  <li>Every ticket splits {p.split_bps.map((b) => b / 100).join(' / ')}: Jackpot, the King you dethrone, the Court, the protocol.</li>
+                  <li>
+                    No early end. The current round's showdown threshold is {money(state.round.showdown_trigger)}; its age limit is {s(state.round.backstop_at - state.round.started_at)}. The showdown runs {s(p.showdown_ms)}; a challenge with less than {s(p.snipe_ms)} remaining extends the remaining time to {s(p.snipe_ms)}.
+                  </li>
+                  <li>Auto-defend retakes the throne for you in the same transaction, up to your max price, with at most 25 retakes per transaction.</li>
+                  <li>
+                    You need {money(p.min_court)} in the Court to challenge. Request a Court withdrawal, then wait until its displayed ready time before withdrawing. Eligible Court deposits enter the draw without spending Court principal. Yield depends on the funded reserve; fees depend on play. Funds remain exposed to contract, token, storage and operator risks.
+                  </li>
+                  <li>Challenge tickets are spent, not refundable Court deposits. Nothing promises a return. Read “Risks and who you trust” below before playing.</li>
+                </ul>
+              </div>
+            </Modal>
+          )}
+        </>
       )}
       {p && (
         <details className="rules">
           <summary>Risks and who you trust</summary>
           <ul>
             <li>Tickets are spent. You can lose them. Nothing here promises a return.</li>
-            {/* Remove once the testnet contract is upgraded and its code hash is checked. */}
             {contractId && (
               <li>
-                The risks below describe this repository's current contract code, which is not deployed. The testnet game runs an older build: don't assume it has the payout records, owner recovery or storage protections described here.
+                {contractId === 'pool.rugpool-release-20261112.testnet'
+                  ? 'pool.rugpool-release-20261112.testnet was verified on November 12, 2026 to match this release’s current contract build on NEAR testnet. This is a deployment snapshot, not a guarantee against later code changes.'
+                  : 'This target has not been verified against this release’s current contract build. Historical or other unverified targets may differ: do not assume they have the payout records, owner recovery or storage protections described below.'}
               </li>
             )}
             <li>

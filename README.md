@@ -13,10 +13,10 @@ Read this first. It says what works and where.
 | Part | State |
 |---|---|
 | Game contract (Rust, `contract/rugpool`) | Implemented; prior independent local execution and scoped draw-storage review passed. Not audited or accepted for production. |
-| App (React, `src/`) | Implemented; prior independent frontend tests/build and local-chain E2E passed. Current external login/wallet flow unverified. |
-| Gas relayer and account activation (`scripts/relayer.ts`) | Implemented; prior local-chain E2E passed with synthetic identity and local wallet keys. Not hosted. |
-| Keeper and solvency monitor (`scripts/keeper.py`) | Built. Its reads were checked against testnet; its sending path was not run in this version. |
-| NEAR testnet | Existing `pool2.rugpool-rehearsal-1021.testnet` is an older deployment, not this release. Its code was captured November 12; exact source/build attribution is unresolved. A separate new testnet deployment is pending. |
+| App (React, `src/`) | Half-speed UI/rules integrated; actual contract-mode build passed. Human email-login and single-player testnet path exercised; see RELEASE.md for evidence limits. |
+| Gas relayer and account activation (`scripts/relayer.ts`) | Used in the bounded local testnet walkthrough with real human login. Loopback-only service, not public hosting. |
+| Keeper and solvency monitor (`scripts/keeper.py`) | One manually invoked bounded settlement finalized successfully; read/solvency checks passed. Not an always-on keeper or tested alerting service. |
+| NEAR testnet | Fresh `pool.rugpool-release-20261112.testnet` and `tusdc.rugpool-release-20261112.testnet` deployed and initialized; deployed WASM hashes verified against authentic artifacts. See RELEASE.md. |
 | NEAR mainnet | Not deployed. |
 | NEAR Intents deposits | Designed for, not live. See [NEAR Intents](#near-intents). |
 | Hosted demo | None. |
@@ -98,11 +98,25 @@ python3 -m unittest discover -s scripts -p 'test_keeper.py'
 cd contract && cargo test -p rugpool -p test-usdc
 ```
 
-Prior independent evidence includes 182 frontend tests, 44 keeper doctests, 10 keeper exit tests, 117 contract unit tests plus 2 test-token tests, selected local-chain regressions, 15 mutation detections, local E2E and four separately executed live-drand tests. These are separate recorded runs, not a newly executed aggregate suite. See RELEASE.md for scope and limits. No tests or builds were run during release packaging; commands above are reproduction instructions, not authorization to run them in the current work session. Contract integration tests require a local NEAR sandbox, and some retrieve public drand data.
+Prior independent evidence includes 182 frontend tests, 44 keeper doctests, 10 keeper exit tests, 117 contract unit tests plus 2 test-token tests, selected local-chain regressions, 15 mutation detections, local E2E and four separately executed live-drand tests. These are separate recorded runs, not a newly executed aggregate suite. See RELEASE.md for scope and limits, including the later focused auth checks and integrated build. No tests or builds were run during the original source-packaging step; commands above are reproduction instructions, not authorization to run them in the current work session. Contract integration tests require a local NEAR sandbox, and some retrieve public drand data.
 
-### 4. The app on the separate release testnet (pending)
+### 4. The app on the separate release testnet
 
-The template deliberately defaults to mocks. After a separately approved new testnet deployment, copy `.env.example` to `.env.local`, fill in the approved new pool/token and relayer origin, then enable `VITE_STORE=contract`. Do not point this release at the old pool2 deployment. Email sign-in needs a public Privy app id (`VITE_PRIVY_APP_ID`) and approved origins; this package contains neither credentials nor configured hosting. Without one the app offers NEAR testnet wallets only. All VITE-prefixed values are public browser configuration.
+The template deliberately defaults to mocks. For the deployed release, copy `.env.example` to `.env.local`, set `VITE_STORE=contract`, `VITE_RUGPOOL_CONTRACT=pool.rugpool-release-20261112.testnet`, `VITE_USDC_CONTRACT=tusdc.rugpool-release-20261112.testnet`, and the approved relayer origin. Do not use old pool2 defaults. Email sign-in needs a public Privy app id (`VITE_PRIVY_APP_ID`) and approved origins; this package contains neither credentials nor configured public hosting. Without one the app offers NEAR testnet wallets only. All VITE-prefixed values are public browser configuration.
+
+The November 12 walkthrough used `http://localhost:5181/` with a loopback relayer on port5187 and a finite runtime window, not a permanent public demo. It exercised Court30/Game10 deposits, one5tUSDC challenge, manual keeper settlement, Claim and Court withdrawal. Final wallet99.375tUSDC and zero player balances/pending withdrawal were verified at finalized block277457159. Claim/withdraw effects are state-confirmed; their transaction receipts were not recovered. The token is publicly mintable **test tUSDC, not real USDC**. Demo configuration uses60-second showdown/withdrawal cooldown,15-second snipe,180-second backstop and10-minute draw interval, unlike the general timings above. Draw completion and multiplayer/auto-defend were not exercised in this live pass.
+
+### Relayer identity verification
+
+Set server-side `PRIVY_APP_ID` to the same public app ID as the frontend and explicitly set `PRIVY_VERIFICATION_MODE=jwks`. The verifier fetches only `https://api.privy.io/v1/apps/<configured-app-id>/jwks.json`; token headers cannot supply a key URL. It accepts matching ES256/P-256 signing keys, caches them for 10 minutes, and refreshes an unknown `kid` at most once per 30 seconds. Fetches time out after 5 seconds, reject redirects, and limit responses to 64 KiB and 32 keys. A newly rotated key may be refused during the refresh cooldown. Fetch/validation failures fail closed; unexpired cached keys remain usable without fetching.
+
+For intentionally pinned, offline verification, use `PRIVY_VERIFICATION_MODE=pem` with `PRIVY_VERIFICATION_KEY` containing the public SPKI PEM. There is no automatic fallback between modes. Existing launch environments with only app ID and PEM must add `PRIVY_VERIFICATION_MODE=pem`. No app secret is used. Neither mode replaces the existing email and exact linked-NEAR-account activation checks.
+
+Focused offline authentication checks (locally generated fixture keys/tokens, not real Privy login):
+
+```sh
+node --experimental-strip-types --import ./scripts/ts-resolve.mjs --test scripts/check-identity-jwks.ts
+```
 
 ## How NEAR is used
 
@@ -132,21 +146,22 @@ The app shows these under **Risks and who you trust**, next to the rules.
 - **The owner can pause new play:** challenges, Court joins and deposits. The pause does not disable claims or withdrawals, though a storage shortage or a failed payout can still stop one from completing. A showdown already running still ends on time. The owner collects the protocol's 5% and can take back the yield reserve.
 - **The draw depends on drand.** If drand never publishes the round a draw named, that draw's pot stays locked. The current contract has no owner method to release a draw without that round's signature. This was a deliberate choice. Whoever can replace the contract's code is a separate trust assumption, listed above.
 - **Yield comes from a funded reserve.** When it is empty, yield stops. It never comes from deposits.
-- **A stuck payout is settled by the owner.** Payouts started by this version are recorded until their outcome is booked. If that step does not complete, the amount stays on the contract's books and the owner can settle the record by hand after an hour, from the chain's record of whether the transfer went through. The contract cannot check the owner's answer. Payouts started by the older build on testnet have no such record, so this recovery and the monitor do not cover them.
+- **A stuck payout is settled by the owner.** Payouts started by this version are recorded until their outcome is booked. If that step does not complete, the amount stays on the contract's books and the owner can settle the record by hand after an hour, from the chain's record of whether the transfer went through. The contract cannot check the owner's answer. The fresh release uses this recorded-payout build; historical old-pool payouts are outside its recovery/monitoring coverage.
 - **Storage.** The contract pays for its own storage in NEAR, and players do not. If it runs short, new deposits, Court joins, arming auto-defend and freezing a new draw stop until it is topped up. Challenges, claims and withdrawals are not paused, but they still need enough NEAR for what they store. If the remaining storage is used up, they can fail until the contract is topped up. The buffer does not guarantee that exits are available. Someone could cause a shortage on purpose by creating many small accounts.
 - **Email logins depend on Privy and the relayer.** Privy manages the account's key. While the relayer is down, an email player cannot challenge or ask to withdraw. A claim, or a withdrawal whose cooldown has ended, can go through any relayer.
 - **The relayer trusts public RPC endpoints.** Before it re-sends an activation payment, it needs two different endpoints to agree the first one failed. Two endpoints run by the same operator would not be independent.
 
 ## Known gaps
 
-- The relayer is one process with its ledger in local files. It is not hosted, and its per-address limits are in memory.
-- The keeper's transaction-sending path and the monitor's alerts have not been run against a live contract in this version.
+- The relayer is one process with its ledger in local files. It was run only on loopback for bounded acceptance, not publicly hosted; its per-address limits are in memory.
+- One bounded keeper settlement was sent and verified FINAL. Continuous operation, draw execution and monitor alert delivery were not accepted by that pass.
 - The older callback path, kept for payouts in flight during an upgrade, trusts any call from the contract's own account. The plan is that no full-access key remains on that account after the upgrade. That has not been set up or checked.
 - The old testnet code hash was captured. An offline populated representative fixture under those exact bytes atomically upgraded and migrated to the authentic current artifact successfully. This is not a migration of live pool state, source/build attribution, or a deployment of this package.
-- Local-chain failed token-transfer/retry and fault-injected current callback recovery evidence exists. A legacy callback already in flight across an upgrade, current external keeper sending, and live wallet/Privy acceptance remain unverified. No further tests were run for packaging.
+- Local-chain failed token-transfer/retry and fault-injected current callback recovery evidence exists. A legacy callback already in flight across an upgrade remains unverified. Fresh deployment and single-player live acceptance do not establish upgrade safety or full production acceptance.
 - A frozen draw may require a native NEAR top-up to finalize if storage headroom is exhausted. No funding-free liveness guarantee is made. The 500-player gas figure in the unchanged keeper comment is an extrapolation from 10/70-depositor measurements, not a 500-player execution.
 - The draw walks every depositor, which is why it holds 500 entrants.
-- Google sign-in through Privy has not been tried. Email sign-in was tried with the October rehearsal build only. The current end-to-end run replaces Privy and the player's wallet with local keys.
+- Google sign-in through Privy has not been tried. Human email sign-in was used in the November12 release walkthrough. Historical automated local E2E still uses synthetic identity/wallet keys; it is separate evidence.
+- The UI can lag at a zero countdown until refreshed state arrives. No functional timer change was made in the Half-speed visual work.
 - Wallet sign-in (without Privy) asks the wallet for the same restricted key, but a wallet may ignore the 1 yoctoNEAR allowance.
 
 ## What was built in the hackathon window

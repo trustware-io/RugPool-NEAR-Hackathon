@@ -26,24 +26,27 @@
     },
     {
       "path": "PROVENANCE.md",
-      "bytes": 2434,
-      "sha256": "7689ebdc79de887e87adda772424cbaa52e222abb5fa1f9b0cc9f1a23b9f44a7",
+      "bytes": 3112,
+      "sha256": "a3e32b88c8cd9f9cd63db20384325e750bcd72b7ff64e81edcd2de749a1d86cc",
       "source_sha256": null,
-      "disposition": "added"
+      "disposition": "reviewed-auth-ui-or-release-documentation-update",
+      "prior_release_sha256": "7689ebdc79de887e87adda772424cbaa52e222abb5fa1f9b0cc9f1a23b9f44a7"
     },
     {
       "path": "README.md",
-      "bytes": 17869,
-      "sha256": "aa8d8de3f6a78c59611c1dc8f6fa8587745af5ad7d01d2db8b8457e06ecb580a",
+      "bytes": 20375,
+      "sha256": "e49a218a3bca35d90dfbd1df782dcbfc8f8f0d21f435f666b7efa0619797a59e",
       "source_sha256": "ce3fa3c89e8c748940b88ddc18e678addbbfb5a2c299f1e8470f0924ab74b6ee",
-      "disposition": "intentional-docs-config-change"
+      "disposition": "reviewed-auth-ui-or-release-documentation-update",
+      "prior_release_sha256": "aa8d8de3f6a78c59611c1dc8f6fa8587745af5ad7d01d2db8b8457e06ecb580a"
     },
     {
       "path": "RELEASE.md",
-      "bytes": 5213,
-      "sha256": "44e783583e79d548a7c1f16f007b7e46f081815a734333a955d4de5dafe8d28e",
+      "bytes": 8988,
+      "sha256": "bfbd6ff7e67daef68c4fbb92680e1abccaf8f793b7b6cba9934bfdeae49cb948",
       "source_sha256": null,
-      "disposition": "added"
+      "disposition": "reviewed-auth-ui-or-release-documentation-update",
+      "prior_release_sha256": "44e783583e79d548a7c1f16f007b7e46f081815a734333a955d4de5dafe8d28e"
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -200,6 +203,13 @@
       "disposition": "identical"
     },
     {
+      "path": "scripts/check-identity-jwks.ts",
+      "bytes": 9752,
+      "sha256": "6b495986e722500995934449a6b3647e59ccb98e5bbf80b5c095194629300ece",
+      "source_sha256": null,
+      "disposition": "added-focused-authentication-check"
+    },
+    {
       "path": "scripts/e2e-slice.ts",
       "bytes": 20375,
       "sha256": "023da0e16d316fa3e283358139eee9625cb5764f9a3073746eba42eda0efd2ab",
@@ -215,10 +225,11 @@
     },
     {
       "path": "scripts/relayer.ts",
-      "bytes": 10865,
-      "sha256": "c7f8e9471d6dace7c97e8928b9808efea76c3b24973d143791214db112dec27e",
+      "bytes": 10977,
+      "sha256": "428f5b17e79d4278342159bd32faa9db5725b955c03f42dfe7219c2bd2415ff1",
       "source_sha256": "c7f8e9471d6dace7c97e8928b9808efea76c3b24973d143791214db112dec27e",
-      "disposition": "identical"
+      "disposition": "reviewed-auth-ui-or-release-documentation-update",
+      "prior_release_sha256": "c7f8e9471d6dace7c97e8928b9808efea76c3b24973d143791214db112dec27e"
     },
     {
       "path": "scripts/test_keeper.py",
@@ -271,10 +282,11 @@
     },
     {
       "path": "src/components/Footer.tsx",
-      "bytes": 5589,
-      "sha256": "1366e2ff889ef22ef8278a2258da6ef783a18e4a41777285eeac722d03fbda45",
+      "bytes": 8271,
+      "sha256": "46df3c82b0e91c611a9c55596639bbdb0431bbf1e5100dd57d166249e4d2ace1",
       "source_sha256": "1366e2ff889ef22ef8278a2258da6ef783a18e4a41777285eeac722d03fbda45",
-      "disposition": "identical"
+      "disposition": "reviewed-auth-ui-or-release-documentation-update",
+      "prior_release_sha256": "1366e2ff889ef22ef8278a2258da6ef783a18e4a41777285eeac722d03fbda45"
     },
     {
       "path": "src/components/Header.tsx",
@@ -502,10 +514,11 @@
     },
     {
       "path": "src/near/identity.ts",
-      "bytes": 3905,
-      "sha256": "e165c00a31a35b220323cbe4b5366d4403c1cae3778d7955a22ce74e9ee99cb5",
+      "bytes": 8133,
+      "sha256": "18f63ba52db5fd31fc18643686096cd32c8ee9d43dcef215d8c504daf359748d",
       "source_sha256": "e165c00a31a35b220323cbe4b5366d4403c1cae3778d7955a22ce74e9ee99cb5",
-      "disposition": "identical"
+      "disposition": "reviewed-auth-ui-or-release-documentation-update",
+      "prior_release_sha256": "e165c00a31a35b220323cbe4b5366d4403c1cae3778d7955a22ce74e9ee99cb5"
     },
     {
       "path": "src/near/jsonLines.test.ts",
@@ -733,10 +746,11 @@
     },
     {
       "path": "src/styles/app.css",
-      "bytes": 26615,
-      "sha256": "dc1764fd7be2552a31bcfe95a8c435177461be380fe4183f365800ce55d811e1",
+      "bytes": 26862,
+      "sha256": "4620939877b51b2ccbbdc5e4518f040ab3da288f7d0ddfc9a87a64b7dd4e83d1",
       "source_sha256": "dc1764fd7be2552a31bcfe95a8c435177461be380fe4183f365800ce55d811e1",
-      "disposition": "identical"
+      "disposition": "reviewed-auth-ui-or-release-documentation-update",
+      "prior_release_sha256": "dc1764fd7be2552a31bcfe95a8c435177461be380fe4183f365800ce55d811e1"
     },
     {
       "path": "tsconfig.json",
@@ -752,5 +766,6 @@
       "source_sha256": "baf2c6e87c5d2aede3b2685a050d500326d669c5d75cc85c4f65d3e0b3d75085",
       "disposition": "identical"
     }
-  ]
+  ],
+  "release_base": "b15a6f7b71e9eeb9332e04e1c315dd0b0422499f"
 }

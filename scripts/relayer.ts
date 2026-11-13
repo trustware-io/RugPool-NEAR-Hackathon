@@ -17,8 +17,9 @@
 //                             (default ~/.near-credentials/testnet; the local chain's is
 //                             .localnet/credentials). Give the relayer its own account and key:
 //                             anything else signing with that key moves its nonce.
-//   PRIVY_APP_ID              enables /activate, with PRIVY_VERIFICATION_KEY: the app's public
-//                             verification key (PEM), from the Privy dashboard
+//   PRIVY_APP_ID              enables /activate with explicit PRIVY_VERIFICATION_MODE:
+//                             jwks: trusted api.privy.io app keyset, rotation-aware
+//                             pem: fixed PRIVY_VERIFICATION_KEY (public SPKI PEM)
 //   ACTIVATION_NEAR           balance an activated account is topped up to (default 0.005)
 //   ACTIVATION_BUDGET_NEAR    most NEAR spent on activations per UTC day (default 1)
 //   ACTIVATIONS_PER_IP        new accounts per IP per day (default 3)
@@ -34,7 +35,7 @@ import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { Account, JsonRpcProvider, parseNearAmount, type KeyPairString } from 'near-api-js'
 import { createActivation, type ActivationRecord, type Ledger } from '../src/near/activation.ts'
-import { importVerificationKey, verifyIdentityToken } from '../src/near/identity.ts'
+import { createIdentityVerifier } from '../src/near/identity.ts'
 import { parseJsonLines } from '../src/near/jsonLines.ts'
 import { createRelayHandler, type KeyBirths } from '../src/near/relayHandler.ts'
 import { GAME_METHODS } from '../src/near/relayPolicy.ts'
@@ -137,11 +138,14 @@ async function chainLimits() {
 }
 
 async function activationHandler() {
-  if (!env.PRIVY_APP_ID || !env.PRIVY_VERIFICATION_KEY) return null
-  const appId = env.PRIVY_APP_ID
-  const verificationKey = await importVerificationKey(env.PRIVY_VERIFICATION_KEY)
+  if (!env.PRIVY_APP_ID) return null
+  const mode = env.PRIVY_VERIFICATION_MODE
+  if (mode !== 'jwks' && mode !== 'pem') throw new Error('Set PRIVY_VERIFICATION_MODE to jwks or pem')
+  const verify = await createIdentityVerifier(env.PRIVY_APP_ID, mode === 'jwks'
+    ? { mode }
+    : { mode, pem: env.PRIVY_VERIFICATION_KEY ?? '' })
   return createActivation({
-    verify: (idToken) => verifyIdentityToken(idToken, verificationKey, appId, Math.floor(Date.now() / 1000)),
+    verify,
     balance: async (accountId) => {
       try {
         return (await provider.viewAccount({ accountId, blockQuery: { finality: 'optimistic' } })).amount

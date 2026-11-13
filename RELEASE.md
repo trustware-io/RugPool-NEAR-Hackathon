@@ -2,13 +2,37 @@
 
 ## Status, 2026-11-12
 
-Source release prepared for public publication as `trustware-io/RugPool-NEAR-Hackathon`. A hosted demo and separate testnet deployment remain pending. No mainnet deployment or real Intents delivery is claimed. No tests, builds, installs, network access or signing were performed during the original packaging step. Publication uses GitHub separately; prior passes are retained, not rerun or renamed acceptance tests.
+Source release at `trustware-io/RugPool-NEAR-Hackathon`; this updated candidate awaits independent integrated review and publication. Fresh testnet deployment and a bounded single-player live walkthrough are complete to the evidence tier below. No public hosted demo, mainnet deployment or real Intents delivery is claimed. No tests, builds, installs, network access or signing were performed during the original source-packaging step; subsequent authorized deployment/live acceptance and integrated build are recorded separately, not retroactively attributed to packaging.
 
 Prior independent evidence recorded November 11–12: frontend 182 tests/typecheck/build; 117 RugPool unit plus 2 token tests; keeper 44 doctests and 10 exit tests; selected local-chain regressions, 15 caught mutations and local-chain E2E; four separately run live-drand tests; scoped draw-storage review; nine synthetic keeper command-boundary cases. Local E2E substitutes identity and wallet keys, not live Privy/email. Gas at 500 depositors is extrapolated from 10/70, not an executed 500-player run.
 
 Exact captured predecessor WASM `f0716ef483b121def3b31599c5fd940861a17f2336d9713b5744554d5f97357a` migrated atomically in one populated offline representative fixture to authentic current artifact `5654b21d3fd65c2f98856da6cfa527119b8eb110ab8473531fbad800cef2d665`; 1 test passed. This does not establish live-state migration, every state shape, source/build attribution of the older deployment, or already-in-flight legacy callbacks across upgrade. The attempted M10 rebuild did not match captured deployed bytes. No WASM from those experiments is distributed here as a release build.
 
-External keeper signing/monitoring, current external Privy/wallet flow and hosting remain unverified. Keeper uses `sign-with-legacy-keychain`; recorded relayer provisioning used system-keychain. Relayer itself reads a JSON private_key from NEAR_CREDENTIALS_DIR. These interfaces are not interchangeable. Do not export or move keys to work around this without explicit approval. `keeper --once` can SEND; it is not a dry-run. Existing keeper comments/examples and application default accounts retain historical identifiers because logic is unchanged; use explicit approved release configuration, never run against old pool2 by accident.
+The live pass used existing isolated role custody: keeper CLI legacy-keychain files and relayer JSON private_key from NEAR_CREDENTIALS_DIR, outside this repository. These interfaces are not interchangeable. Do not export or move keys to work around configuration without explicit approval. `keeper --once` can SEND; it is not a dry-run. Existing keeper comments/examples and application default accounts retain historical identifiers because logic is unchanged; use explicit approved release configuration, never run against old pool2 by accident.
+
+## Fresh deployment and bounded live acceptance — November 12 EST
+
+Fresh pool `pool.rugpool-release-20261112.testnet` and token `tusdc.rugpool-release-20261112.testnet` were deployed with `new`, not an upgrade/migration. Both deployed binaries were independently downloaded and hash-matched at finalized block277452821:
+
+| Artifact | SHA-256 |
+|---|---|
+| Pool | `5654b21d3fd65c2f98856da6cfa527119b8eb110ab8473531fbad800cef2d665` |
+| Test token | `0f798610daa79642b685f4adfa5dd31ca94a1ad3518a62fb3d8071aaedd0a042` |
+
+All16 retained contract source pins matched this release; pool lib SHA-256 `4311a56cc1eabc8c049b91a6bbeda255ce5fef722940b77a2bc3e89c04728ee4`. Authentic retained artifacts were used, not a new reproducibility build. Token is publicly mintable6-decimal tUSDC, not real USDC. Contracts retain account keys and are upgradeable. Intents configuration is null. Demo timings:60s withdrawal cooldown/showdown,15s snipe,180s backstop,10min draw interval; registration fee0, funded yield reserve0.
+
+Deployment transactions (independently checked FINAL with successful receipts):
+- Token deploy/init: `6SKAoQ1XJygb8TGaRTBJkUFe3AF2dgQGyRzXCGJhxcoa`.
+- Pool deploy/init: `AgLH4MLbtijkVkdE13H1CwfbbiBJRPYVArjV2QQuc9M5`.
+- Pool token-storage registration: `472AqiH4nrx7VwmreTYKmZ5uo5ETpFAJEep1CAdYg6xt`.
+
+Human-operated email login/activation and Court30/Game10 deposits were followed by one5tUSDC challenge. The manually invoked, bounded keeper sent only `settle_round` (30Tgas,0NEAR attached): `D5G9KXm69AWs7roKiPrYyLVzAakjo1qqnBcsUfWsBR3h`, signer `keeper.rugpool-release-20261112.testnet`. Independent RPC returned FINAL success and all successful receipt outcomes. Jackpot4tUSDC was credited internally before Claim, not immediately paid to the wallet. No always-on keeper is deployed; no claim of live draw completion or exercised alert delivery.
+
+**Final exit state:** observed2026-11-13T03:48:11.759003Z (November12 EST), finalized block277457159, hash `3dm7meeYFdEBz9NbGzrVB7LQCvdpsmGfzqP8p5UEYEEb`, via `https://rpc.testnet.near.org`. Player `9b7f2514f67202a2b468ad93e037664d59601d351ea0c296dc844372f7f985b1`: wallet99.375tUSDC; Game0, Court0, earned0, stream0, pending withdrawal0, readiness null. Previous post-Claim wallet69.375 increased by exactly30. Latest payout ID3 has no remaining record; in-flight liability0. Pool625000base units equals liabilities375000draw pot +250000treasury exactly. This is snapshot solvency, not a perpetual guarantee; player exit does not mean the pool is empty.
+
+**Evidence limit:** claim and final withdrawal are confirmed by finalized balance/accounting effects, not recovered transaction hashes/receipts. The keeper receipt proves settlement only. Completed payout callbacks remove records; application event IDs are not transaction hashes. No private browser/log recovery or broad chain search was used. This accepts the bounded single-player path, not multiplayer, auto-defend, live draw, mainnet, Intents, Google login, upgrade compatibility or production readiness.
+
+Half-speed UI/rules were checked in actual built React with pointer/keyboard coverage; integrated contract-mode build passed (1547modules; dependency externalization and large-chunk warnings retained). Focused auth checks and independent auth review passed at pinned source. No broad historical suite was repeated for this candidate. Final documentation edits do not change the built code. Runtime was loopback frontend5181/relayer5187 with automatic expiry November12 23:12EST; it is not a permanently available judge URL. A separate demo video/public delivery and final submission remain outside this candidate.
 
 ## Reproduction instructions (not executed in packaging)
 
@@ -35,7 +59,7 @@ Expected output locations: `contract/target/wasm32-unknown-unknown/release/rugpo
 
 For test and local-chain instructions, see README.md. Use `cargo test --locked -p rugpool -p test-usdc` from contract/. Local-chain examples produce disposable `.localnet` keys and state; those are never release contents. Some integration tests need public beacon access. No further execution is authorized merely by documenting these commands.
 
-## Later release sequence
+## Historical original release sequence (deployment/live walkthrough now superseded above)
 
 1. Owner confirms repository owner/name and visibility, separate testnet accounts, signing custody, transaction/funding caps and hosting. No real-value or mainnet scope implied.
 2. Publish only this source tree after final local source/privacy review; preserve this provenance. Do not publish the surrounding packaging/evidence directory.
