@@ -4,7 +4,7 @@ A king-of-the-hill game on NEAR. Players pay a rising price to take the throne, 
 
 Built at NEAR HACKATHON for the `games` track.
 
-Source release packaged 12 November 2026 from the existing October–November project. See [PROVENANCE.md](PROVENANCE.md) and [RELEASE.md](RELEASE.md). This is not a claim that development began on November 1.
+Source release packaged 12 November 2026 from the existing November project. See [PROVENANCE.md](PROVENANCE.md) and [RELEASE.md](RELEASE.md).
 
 ## Status
 
