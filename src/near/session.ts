@@ -75,11 +75,16 @@ export class SessionSigner {
     }
   }
 
-  async sign(receiverId: string, method: string, args: Record<string, unknown>, tgas: number): Promise<WireDelegate> {
+  async sign(receiverId: string, method: string, args: Record<string, unknown>, tgas: number, guard?: () => void): Promise<WireDelegate> {
     const [access, block] = await Promise.all([
       this.provider.viewAccessKey({ accountId: this.accountId, publicKey: this.key.getPublicKey(), finalityQuery: { finality: 'optimistic' } }),
       this.provider.viewBlock({ finality: 'final' }),
     ])
+    if (guard) {
+      guard()
+      const p = access.permission
+      if (typeof p !== 'object' || p.FunctionCall.receiver_id !== receiverId || p.FunctionCall.allowance !== SESSION_KEY_ALLOWANCE.toString() || !p.FunctionCall.method_names.includes(method)) throw Error('Existing session permission is unavailable. Sign in explicitly; no automatic renewal.')
+    }
     this.nonce = (access.nonce > this.nonce ? access.nonce : this.nonce) + 1n
     const delegateAction = buildDelegateAction({
       senderId: this.accountId,

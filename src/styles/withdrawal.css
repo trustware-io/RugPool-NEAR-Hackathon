@@ -1,0 +1,5 @@
+.withdrawal-progress { margin-block: 1rem; overflow-wrap: anywhere; }
+.withdrawal-progress [role="status"] { display: flex; align-items: center; gap: .65rem; }
+.withdrawal-ring { display: inline-block; flex: 0 0 1.1rem; width: 1.1rem; height: 1.1rem; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: withdrawal-spin 1.4s linear infinite; }
+@keyframes withdrawal-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .withdrawal-ring { animation: none; } }

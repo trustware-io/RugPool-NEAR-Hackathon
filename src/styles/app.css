@@ -916,6 +916,18 @@ button:disabled {
 .rules-content li {
   margin: 12px 0;
 }
+.rules-preference {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  cursor: pointer;
+}
+.rules-preference input {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+}
 .mock-bar {
   margin-top: 14px;
   display: flex;

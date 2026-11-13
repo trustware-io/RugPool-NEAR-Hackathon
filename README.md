@@ -44,16 +44,20 @@ Read this first. It says what works and where.
 
 ## Try it
 
-You need Node 23 or 24. The chain steps also need Rust; `contract/rust-toolchain.toml` pins 1.93.0.
+Use Node 24 and npm with the included lockfile. Local-chain steps also need Rust 1.93.0 and the wasm32-unknown-unknown target; see [reproduction prerequisites](RELEASE.md#reproduction-instructions-not-executed-in-packaging). Python 3.9+ is needed for keeper checks. Prior chain tooling used NEAR sandbox 2.13.4 and cargo-near 0.23.0. Initial dependency/tool provisioning needs network access; some contract integration tests also retrieve public drand data.
 
 ### 1. The game on mocks (2 minutes, no chain)
 
+Run these commands from the repository root. The browser-only simulation needs no Privy setup, relayer or funded account.
+
 ```
 npm ci
-npm run dev
+VITE_STORE=mock npm run dev
 ```
 
 Open the address Vite prints and add `?fast=1` to it, for example `http://localhost:5173/?fast=1`. That uses short demo timings.
+
+On first visit, read and close the rules dialog before using Connect. The optional local opt-out suppresses automatic reopening; the footer rules button remains available.
 
 - **See:** a round already in progress. Bots are challenging each other, the Jackpot is rising, and the live feed is scrolling.
 - **Do:** click **Connect**. **See:** the button becomes **Deposit**.
@@ -67,6 +71,8 @@ Confirm each deposit within 30 seconds of opening its dialog. The mock's quote e
 
 Everything in this mode is simulated in the browser, including the deposit. The deposit dialog's "from any chain" wording describes the intended design, not something this build does.
 
+Mock balances, deposits, bots, yield and payouts are simulated. Mock Claim/withdrawal credits internal game balance, not an external wallet; it is not payout or NEAR Intents evidence.
+
 ### 2. The contract, relayer and money path on a local NEAR chain (about 5 minutes)
 
 This runs the real contract on a real local NEAR node, with the real relayer in front of it. Use two terminals.
@@ -78,10 +84,10 @@ cd contract
 cargo run -p rugpool --example localnet -- --accounts 4 --port 3031
 ```
 
-Terminal 2, once terminal 1 has written `.localnet/localnet.json`:
+Terminal 2, from the repository root (not `contract/`), once terminal 1 has written `.localnet/localnet.json`:
 
 ```
-node --experimental-strip-types --no-warnings --import ./scripts/ts-resolve.mjs scripts/e2e-slice.ts
+PRIVY_VERIFICATION_MODE=pem node --experimental-strip-types --no-warnings --import ./scripts/ts-resolve.mjs scripts/e2e-slice.ts
 ```
 
 - **See:** 38 lines starting with `PASS` and no `FAIL`. The script exits non-zero on the first failure and writes `.localnet/e2e-result.json`.
@@ -100,9 +106,13 @@ cd contract && cargo test -p rugpool -p test-usdc
 
 Prior independent evidence includes 182 frontend tests, 44 keeper doctests, 10 keeper exit tests, 117 contract unit tests plus 2 test-token tests, selected local-chain regressions, 15 mutation detections, local E2E and four separately executed live-drand tests. These are separate recorded runs, not a newly executed aggregate suite. See RELEASE.md for scope and limits, including the later focused auth checks and integrated build. No tests or builds were run during the original source-packaging step; commands above are reproduction instructions, not authorization to run them in the current work session. Contract integration tests require a local NEAR sandbox, and some retrieve public drand data.
 
-### 4. The app on the separate release testnet
+### 4. Owner-operated release testnet (not a self-service judge demo)
 
-The template deliberately defaults to mocks. For the deployed release, copy `.env.example` to `.env.local`, set `VITE_STORE=contract`, `VITE_RUGPOOL_CONTRACT=pool.rugpool-release-20261112.testnet`, `VITE_USDC_CONTRACT=tusdc.rugpool-release-20261112.testnet`, and the approved relayer origin. Do not use old pool2 defaults. Email sign-in needs a public Privy app id (`VITE_PRIVY_APP_ID`) and approved origins; this package contains neither credentials nor configured public hosting. Without one the app offers NEAR testnet wallets only. All VITE-prefixed values are public browser configuration.
+Judges can reproduce the browser simulation and local-chain path above. The deployed testnet walkthrough below is dated evidence, not an available hosted service. Contract mode requires an owner-provisioned, funded and pool-authorized relayer; selecting a wallet instead of Privy does not make the supported gas-relayed game path self-contained. No relayer key or live service is distributed with this release.
+
+For a separately authorized operator setup, set public frontend values `VITE_STORE=contract`, `VITE_RUGPOOL_CONTRACT=pool.rugpool-release-20261112.testnet`, `VITE_USDC_CONTRACT=tusdc.rugpool-release-20261112.testnet` and `VITE_RELAYER_URL` to that operator's relayer URL. The historical local pairing was frontend `http://localhost:5181` and relayer `http://localhost:5187`; these are not promised live endpoints. Pass the exact frontend origin `http://localhost:5181` as the relayer's allowed-origin argument for that pairing; localhost and 127.0.0.1 are not interchangeable origins. Do not use old pool2 defaults.
+
+The relayer reads `<relayer-account>.json` with a `private_key` from server-side `NEAR_CREDENTIALS_DIR`, and needs a persistent private `RELAYER_DATA_DIR` with one owning process. Its account requires testnet NEAR for relay gas and approved activation budgets. Keep credentials and ledgers outside Git/static hosting; never put them in VITE values or export existing keys to satisfy this recipe. Email activation additionally requires matching public frontend `VITE_PRIVY_APP_ID` and server `PRIVY_APP_ID`, approved Privy origins and explicit verification mode below. Without Privy, the app offers wallet selection, not a funded relayer service. This section describes operator prerequisites, not a turnkey judge setup or permission to provision/sign.
 
 The November 12 walkthrough used `http://localhost:5181/` with a loopback relayer on port5187 and a finite runtime window, not a permanent public demo. It exercised Court30/Game10 deposits, one5tUSDC challenge, manual keeper settlement, Claim and Court withdrawal. Final wallet99.375tUSDC and zero player balances/pending withdrawal were verified at finalized block277457159. Claim/withdraw effects are state-confirmed; their transaction receipts were not recovered. The token is publicly mintable **test tUSDC, not real USDC**. Demo configuration uses60-second showdown/withdrawal cooldown,15-second snipe,180-second backstop and10-minute draw interval, unlike the general timings above. Draw completion and multiplayer/auto-defend were not exercised in this live pass.
 
@@ -153,6 +163,7 @@ The app shows these under **Risks and who you trust**, next to the rules.
 
 ## Known gaps
 
+- Three unresolved dependency advisories remain; see [versions, severities and reachability limits](RELEASE.md#unresolved-dependency-advisories). No production-security clearance is claimed.
 - The relayer is one process with its ledger in local files. It was run only on loopback for bounded acceptance, not publicly hosted; its per-address limits are in memory.
 - One bounded keeper settlement was sent and verified FINAL. Continuous operation, draw execution and monitor alert delivery were not accepted by that pass.
 - The older callback path, kept for payouts in flight during an upgrade, trusts any call from the contract's own account. The plan is that no full-access key remains on that account after the upgrade. That has not been set up or checked.
@@ -174,6 +185,8 @@ This is a fresh source-only release of an existing October–November project, n
 Original repository: <https://github.com/hlassige/rugpool-app> (private preservation repository; not a public judge-accessible history link). See PROVENANCE.md for the exact candidate base and packaging boundary.
 
 Earlier planning drafts and original history are preserved outside this source release. Development began in October; publication in a fresh repository does not change that provenance.
+
+The source-only packaging manifest establishes copied-file provenance, not a publicly inspectable development-window diff. The original development history remains private; this release does not yet supply the public baseline/window comparison described in Q-003. The recorded October 21 start lies inside Q-001's October 19 eligibility window, but the absence of earlier first-party baseline work has not been independently established by this public package.
 
 ## Libraries and AI use
 

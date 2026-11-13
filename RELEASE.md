@@ -2,7 +2,11 @@
 
 ## Status, 2026-11-12
 
-Source release at `trustware-io/RugPool-NEAR-Hackathon`; this updated candidate awaits independent integrated review and publication. Fresh testnet deployment and a bounded single-player live walkthrough are complete to the evidence tier below. No public hosted demo, mainnet deployment or real Intents delivery is claimed. No tests, builds, installs, network access or signing were performed during the original source-packaging step; subsequent authorized deployment/live acceptance and integrated build are recorded separately, not retroactively attributed to packaging.
+Baseline `080ed6fafb4cea6ea7e296cbd3611e18868cf1bc` was published at `trustware-io/RugPool-NEAR-Hackathon` on November 12 following scoped independent review. Later automatic-rules and one-click withdrawal changes are a separate candidate and are not covered by that publication verdict. Fresh testnet deployment and a bounded single-player live walkthrough are complete to the evidence tier below. No public hosted demo, mainnet deployment or real Intents delivery is claimed. No tests, builds, installs, network access or signing were performed during the original source-packaging step; subsequent authorized deployment/live acceptance and integrated build are recorded separately, not retroactively attributed to packaging.
+
+### Local successor candidate — November 13
+
+The uncommitted successor adds automatic rules preferences and one-start Court withdrawal UI/controller with finalized-receipt and snapshot-freshness checks. Its 19-file code patch SHA-256 is `a53a2efc79a1f62834aa40e082f28a194a75a7ef469a4fb5f4987d493901ab6e`. Scoped independent code review and 51 focused tests passed; retained browser evidence passed rules/preference/keyboard checks and synthetic withdrawal lifecycle, reduced-motion and cooperating-tab checks. Withdrawal browser checks use authentic components with a synthetic adapter, not live payments. Narrow desktop-browser viewport coverage is not physical-mobile verification. The November 12 live payout evidence below does not test this newer workflow. Documentation and manifest corrections follow that code freeze; the combined candidate still awaits independent docs/publication review and is not published.
 
 Prior independent evidence recorded November 11–12: frontend 182 tests/typecheck/build; 117 RugPool unit plus 2 token tests; keeper 44 doctests and 10 exit tests; selected local-chain regressions, 15 caught mutations and local-chain E2E; four separately run live-drand tests; scoped draw-storage review; nine synthetic keeper command-boundary cases. Local E2E substitutes identity and wallet keys, not live Privy/email. Gas at 500 depositors is extrapolated from 10/70, not an executed 500-player run.
 
@@ -33,6 +37,16 @@ Human-operated email login/activation and Court30/Game10 deposits were followed 
 **Evidence limit:** claim and final withdrawal are confirmed by finalized balance/accounting effects, not recovered transaction hashes/receipts. The keeper receipt proves settlement only. Completed payout callbacks remove records; application event IDs are not transaction hashes. No private browser/log recovery or broad chain search was used. This accepts the bounded single-player path, not multiplayer, auto-defend, live draw, mainnet, Intents, Google login, upgrade compatibility or production readiness.
 
 Half-speed UI/rules were checked in actual built React with pointer/keyboard coverage; integrated contract-mode build passed (1547modules; dependency externalization and large-chunk warnings retained). Focused auth checks and independent auth review passed at pinned source. No broad historical suite was repeated for this candidate. Final documentation edits do not change the built code. Runtime was loopback frontend5181/relayer5187 with automatic expiry November12 23:12EST; it is not a permanently available judge URL. A separate demo video/public delivery and final submission remain outside this candidate.
+
+## Unresolved dependency advisories
+
+This unaudited testnet release retains three unresolved version-applicable advisories. None was demonstrated as a RugPool exploit by the bounded static review; this is not production or real-funds security clearance.
+
+- **wee_alloc 0.4.5 — critical, [GHSA-rc23-xxgq-x27g](https://github.com/advisories/GHSA-rc23-xxgq-x27g).** near-sdk 5.29.1 defaults select it as the wasm32 global allocator in both contracts. This is a real source-defined runtime dependency, not merely test tooling. The advisory concerns abandonment/reported leaks, with no patched release or demonstrated RugPool exploit. Deployed binary inclusion was not freshly inspected. Reviewed allocator removal/replacement, rebuild and validation are required before real-funds acceptance.
+- **zod 3.25.76 — high, [GHSA-mrhx-c7xc-m3w5](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5).** The browser Privy→api-base dependency falls within the published affected range. The reviewed scalar APIError schema does not establish a reachable attacker-sized affected collection parse. Conditional memory-exhaustion risk remains open; use an upstream-compatible remediation, not an untested forced v3→v4 override.
+- **elliptic 6.6.1 — low, [GHSA-848j-6mx2-7j84](https://github.com/advisories/GHSA-848j-6mx2-7j84).** The transitive Peerfolio→old near-js crypto→secp256k1 dependency contains affected ECDSA signing. Reviewed RugPool session/signing uses Ed25519; JWT verification uses WebCrypto, not elliptic signing. Vulnerable signing reachability and key compromise were not demonstrated. Keep the advisory open pending supported dependency replacement; dependency presence alone is not evidence requiring key rotation.
+
+Review scope: public baseline 080ed6, static dependency/source analysis, not exploit reproduction or final bundle/dead-code proof. Future dependency/source changes require a new disposition.
 
 ## Reproduction instructions (not executed in packaging)
 

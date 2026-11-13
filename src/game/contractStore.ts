@@ -2,6 +2,8 @@
 // showdown and settlement, and auto-defend.
 
 import { returnValue, type Near } from '../near/near'
+import { finalizedWithdrawalReceipt } from '../near/withdrawalReceipt'
+import type { Snapshot, WithdrawalPort } from '../state/withdrawalFlow'
 import type { PrivySession } from '../privy/privySession'
 import type { PrivyNearWallet } from '../privy/signer'
 import { GameError, type AccountView, type EmailSignIn, type EventPage, type GameEvent, type GameEventType, type GameState, type GameStore, type U128 } from './types'
@@ -22,6 +24,7 @@ export class ContractStore implements GameStore {
   private readonly privy: PrivySession | null
   readonly emailSignIn?: EmailSignIn
   private me: string | null = null
+  private identityGeneration = 0
   /** Chain time minus local time. */
   private offset = 0
   private syncedAt = 0
@@ -41,6 +44,7 @@ export class ContractStore implements GameStore {
       void privy.restore().then((wallet) => (wallet && !this.me ? this.signInWithPrivy(privy, wallet) : null), () => null)
     }
     near.connector.on('wallet:signOut', () => {
+      this.identityGeneration++
       this.me = null
     })
   }
@@ -54,17 +58,20 @@ export class ContractStore implements GameStore {
   }
 
   async connect(): Promise<string> {
+    this.identityGeneration++
     this.me = await this.near.connect()
     return this.me
   }
 
   async disconnect(): Promise<void> {
+    this.identityGeneration++
     await this.near.disconnect()
     await this.privy?.logout()
     this.me = null
   }
 
   private async signInWithPrivy(privy: PrivySession, wallet: PrivyNearWallet): Promise<string> {
+    this.identityGeneration++
     await this.near.signInWith(wallet.address, await privy.signer(wallet), () => privy.identityToken())
     this.me = wallet.address
     return wallet.address
@@ -110,6 +117,41 @@ export class ContractStore implements GameStore {
 
   async joinCourt(amount: U128): Promise<void> {
     await this.act('join_court', { amount })
+  }
+
+  withdrawalKey(): string | null { return this.me ? `testnet:${this.near.config.rugpool}:${this.me}` : null }
+
+  captureWithdrawal(automatic = true): WithdrawalPort {
+    const account = this.me
+    if (!account) throw Error('Connect an account first.')
+    const contract = this.near.config.rugpool
+    const generation = this.identityGeneration
+    const captured = automatic ? this.near.captureWithdrawalSession(account) : this.near.captureWalletWithdrawal(account)
+    const valid = () => generation === this.identityGeneration && this.me === account && this.near.config.rugpool === contract && captured.valid()
+    const read = async (blockId?: string): Promise<Snapshot> => {
+      const block = await this.near.provider.viewBlock(blockId ? { blockId } : { finality: 'final' })
+      const blockQuery = { blockId: block.header.hash }
+      const [a, liabilities] = await Promise.all([
+        this.near.provider.callFunction<AccountView>({ contractId: contract, method: 'get_account', args: { account_id: account }, blockQuery }),
+        this.near.provider.callFunction<{ in_flight: string }>({ contractId: contract, method: 'get_liabilities', args: {}, blockQuery }),
+      ])
+      if (!valid() || !a || !liabilities) throw Error('Withdrawal identity or chain data unavailable.')
+      return { height: block.header.height, court: a.court, pending: a.withdraw_pending, ready: a.withdraw_ready_at, inFlight: liabilities.in_flight, now: Number(BigInt(block.header.timestamp_nanosec) / 1_000_000n) }
+    }
+    return {
+      key: `testnet:${contract}:${account}`, valid, read,
+      send: async (method, amount, guard) => {
+        const check = () => { guard(); if (!valid()) throw Error('Withdrawal identity changed.') }
+        check()
+        const raw = await captured.send(method, amount === undefined ? {} : { amount }, check)
+        const result = await finalizedWithdrawalReceipt(raw, contract, method,
+          args => this.near.provider.viewTransactionStatusWithReceipts(args), check)
+        if (result.kind !== 'requested') return result
+        // Read the request's actual receipt block, not an unrelated later aggregate.
+        try { return { kind: 'request', id: result.id, snapshot: await read(result.block) } }
+        catch { return { kind: 'unknown', id: result.id } }
+      },
+    }
   }
 
   async requestWithdraw(amount: U128): Promise<void> {

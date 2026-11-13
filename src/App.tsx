@@ -17,6 +17,7 @@ import { RoundHero } from './components/RoundHero'
 import { Ticker } from './components/Ticker'
 import { Toasts } from './components/Toasts'
 import { DepositProvider } from './state/DepositContext'
+import { WithdrawalProvider } from './state/WithdrawalContext'
 import { phaseOf } from './state/derive'
 import { GameProvider, useGame } from './state/GameContext'
 import { deposits, store } from './state/services'
@@ -86,7 +87,7 @@ export function App() {
     <UiProvider>
       <GameProvider store={store}>
         <DepositProvider service={deposits}>
-          <Shell />
+          <WithdrawalProvider><Shell /></WithdrawalProvider>
         </DepositProvider>
       </GameProvider>
     </UiProvider>

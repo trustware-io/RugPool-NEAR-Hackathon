@@ -26,27 +26,30 @@
     },
     {
       "path": "PROVENANCE.md",
-      "bytes": 3112,
-      "sha256": "a3e32b88c8cd9f9cd63db20384325e750bcd72b7ff64e81edcd2de749a1d86cc",
+      "bytes": 4777,
+      "sha256": "88f12695d8f2a375a737f5d78331340f23b0bbb6f8b6983561f614e64d6cdfb2",
       "source_sha256": null,
-      "disposition": "reviewed-auth-ui-or-release-documentation-update",
-      "prior_release_sha256": "7689ebdc79de887e87adda772424cbaa52e222abb5fa1f9b0cc9f1a23b9f44a7"
+      "disposition": "local-rules-withdrawal-or-submission-docs-candidate-update",
+      "prior_release_sha256": "7689ebdc79de887e87adda772424cbaa52e222abb5fa1f9b0cc9f1a23b9f44a7",
+      "published_080ed6_sha256": "a3e32b88c8cd9f9cd63db20384325e750bcd72b7ff64e81edcd2de749a1d86cc"
     },
     {
       "path": "README.md",
-      "bytes": 20375,
-      "sha256": "e49a218a3bca35d90dfbd1df782dcbfc8f8f0d21f435f666b7efa0619797a59e",
+      "bytes": 23164,
+      "sha256": "129acaa1b7c52f5b3c77b65754036378fe415066c3ef422e65c2e7f64ff637aa",
       "source_sha256": "ce3fa3c89e8c748940b88ddc18e678addbbfb5a2c299f1e8470f0924ab74b6ee",
-      "disposition": "reviewed-auth-ui-or-release-documentation-update",
-      "prior_release_sha256": "aa8d8de3f6a78c59611c1dc8f6fa8587745af5ad7d01d2db8b8457e06ecb580a"
+      "disposition": "local-rules-withdrawal-or-submission-docs-candidate-update",
+      "prior_release_sha256": "aa8d8de3f6a78c59611c1dc8f6fa8587745af5ad7d01d2db8b8457e06ecb580a",
+      "published_080ed6_sha256": "e49a218a3bca35d90dfbd1df782dcbfc8f8f0d21f435f666b7efa0619797a59e"
     },
     {
       "path": "RELEASE.md",
-      "bytes": 8988,
-      "sha256": "bfbd6ff7e67daef68c4fbb92680e1abccaf8f793b7b6cba9934bfdeae49cb948",
+      "bytes": 11986,
+      "sha256": "e533cdf67f00d8099899736e9e144dc3c7bd63e47c035f4fd3c90d5cea8d34c1",
       "source_sha256": null,
-      "disposition": "reviewed-auth-ui-or-release-documentation-update",
-      "prior_release_sha256": "44e783583e79d548a7c1f16f007b7e46f081815a734333a955d4de5dafe8d28e"
+      "disposition": "local-rules-withdrawal-or-submission-docs-candidate-update",
+      "prior_release_sha256": "44e783583e79d548a7c1f16f007b7e46f081815a734333a955d4de5dafe8d28e",
+      "published_080ed6_sha256": "bfbd6ff7e67daef68c4fbb92680e1abccaf8f793b7b6cba9934bfdeae49cb948"
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -247,10 +250,11 @@
     },
     {
       "path": "src/App.tsx",
-      "bytes": 2863,
-      "sha256": "ebcc15adc884e20b944676f47930b547cde12384a47b29dd56460e2028ae1465",
+      "bytes": 2967,
+      "sha256": "4db08dbe7ebb626fd868e1bcede8bfd211aafc0cbe8f4b2f55120b14d6b457fc",
       "source_sha256": "ebcc15adc884e20b944676f47930b547cde12384a47b29dd56460e2028ae1465",
-      "disposition": "identical"
+      "disposition": "local-rules-withdrawal-or-submission-docs-candidate-update",
+      "published_080ed6_sha256": "ebcc15adc884e20b944676f47930b547cde12384a47b29dd56460e2028ae1465"
     },
     {
       "path": "src/components/AutoDefendCard.tsx",
@@ -268,10 +272,11 @@
     },
     {
       "path": "src/components/CourtPanel.tsx",
-      "bytes": 3794,
-      "sha256": "7f3b1c3ff08b0418304d6d82a8decf0cf62582b55ed5633708e1ed16b2604c68",
+      "bytes": 5387,
+      "sha256": "b153f130f6f75ae3daaf889ef2104f31ca271d7aea5bde52e0ae76bf48c03ea3",
       "source_sha256": "7f3b1c3ff08b0418304d6d82a8decf0cf62582b55ed5633708e1ed16b2604c68",
-      "disposition": "identical"
+      "disposition": "local-rules-withdrawal-or-submission-docs-candidate-update",
+      "published_080ed6_sha256": "7f3b1c3ff08b0418304d6d82a8decf0cf62582b55ed5633708e1ed16b2604c68"
     },
     {
       "path": "src/components/Effects.tsx",
@@ -281,12 +286,20 @@
       "disposition": "identical"
     },
     {
+      "path": "src/components/Footer.test.tsx",
+      "bytes": 1516,
+      "sha256": "cd92a12162fda4eb2793f30a23bb200699baac9d1bb3b1f23ee29ab5a3b2268b",
+      "source_sha256": null,
+      "disposition": "local-rules-withdrawal-candidate-addition"
+    },
+    {
       "path": "src/components/Footer.tsx",
-      "bytes": 8271,
-      "sha256": "46df3c82b0e91c611a9c55596639bbdb0431bbf1e5100dd57d166249e4d2ace1",
+      "bytes": 9754,
+      "sha256": "e5b1b5e96e037db761f4fdcdb3e6ff0c1359a7b553c47ee5bd215a23b4b9e335",
       "source_sha256": "1366e2ff889ef22ef8278a2258da6ef783a18e4a41777285eeac722d03fbda45",
-      "disposition": "reviewed-auth-ui-or-release-documentation-update",
-      "prior_release_sha256": "1366e2ff889ef22ef8278a2258da6ef783a18e4a41777285eeac722d03fbda45"
+      "disposition": "local-rules-withdrawal-or-submission-docs-candidate-update",
+      "prior_release_sha256": "1366e2ff889ef22ef8278a2258da6ef783a18e4a41777285eeac722d03fbda45",
+      "published_080ed6_sha256": "46df3c82b0e91c611a9c55596639bbdb0431bbf1e5100dd57d166249e4d2ace1"
     },
     {
       "path": "src/components/Header.tsx",
@@ -352,6 +365,20 @@
       "disposition": "identical"
     },
     {
+      "path": "src/components/WithdrawalStatus.test.tsx",
+      "bytes": 781,
+      "sha256": "24f6fc17b84c3da8758b2a8386b2363f82a0967be17a180b805ce93b5114cef6",
+      "source_sha256": null,
+      "disposition": "local-rules-withdrawal-candidate-addition"
+    },
+    {
+      "path": "src/components/WithdrawalStatus.tsx",
+      "bytes": 817,
+      "sha256": "15865d8add96f6065680c8c463936c00222fdcef868f73b49779756b37dc1e5a",
+      "source_sha256": null,
+      "disposition": "local-rules-withdrawal-candidate-addition"
+    },
+    {
       "path": "src/components/modals/AutoDefendModal.tsx",
       "bytes": 2788,
       "sha256": "ab027edda44ccc9d56cdcb01291ae83540fd5e146876e1b9705482b39a2b4ef0",
@@ -388,10 +415,11 @@
     },
     {
       "path": "src/components/modals/WithdrawModal.tsx",
-      "bytes": 1879,
-      "sha256": "ea1bb7a1a9025e3002f10b1d201a73a11fa132536a846b4f5030849f8f57d9eb",
+      "bytes": 3781,
+      "sha256": "c157a144e18fa0c3f69b78cb46c20d79e4a6b72ad8a2fce59160a9baeda3d989",
       "source_sha256": "ea1bb7a1a9025e3002f10b1d201a73a11fa132536a846b4f5030849f8f57d9eb",
-      "disposition": "identical"
+      "disposition": "local-rules-withdrawal-or-submission-docs-candidate-update",
+      "published_080ed6_sha256": "ea1bb7a1a9025e3002f10b1d201a73a11fa132536a846b4f5030849f8f57d9eb"
     },
     {
       "path": "src/deposit/mockDeposit.test.ts",
@@ -430,10 +458,11 @@
     },
     {
       "path": "src/game/contractStore.ts",
-      "bytes": 5507,
-      "sha256": "5d8fa2deeaeb6d3ee00960c45c4ae2f5d56a9501b08f41a9046b822ee4ba6528",
+      "bytes": 8124,
+      "sha256": "86f7a0f0e9cf792cf02c36273a59d9da3e99f8eccc4404e61eaeeebf1e40be83",
       "source_sha256": "5d8fa2deeaeb6d3ee00960c45c4ae2f5d56a9501b08f41a9046b822ee4ba6528",
-      "disposition": "identical"
+      "disposition": "local-rules-withdrawal-or-submission-docs-candidate-update",
+      "published_080ed6_sha256": "5d8fa2deeaeb6d3ee00960c45c4ae2f5d56a9501b08f41a9046b822ee4ba6528"
     },
     {
       "path": "src/game/curve.ts",
@@ -550,10 +579,11 @@
     },
     {
       "path": "src/near/near.ts",
-      "bytes": 16370,
-      "sha256": "f816581dcb59a1a89c3de332aa045824e43f891ffd2ad4ddf51df4126fd11358",
+      "bytes": 18711,
+      "sha256": "f206bdeff3b5eeac11c89cf132c78be669239fa6aec6d7957ce05983279aa7a0",
       "source_sha256": "f816581dcb59a1a89c3de332aa045824e43f891ffd2ad4ddf51df4126fd11358",
-      "disposition": "identical"
+      "disposition": "local-rules-withdrawal-or-submission-docs-candidate-update",
+      "published_080ed6_sha256": "f816581dcb59a1a89c3de332aa045824e43f891ffd2ad4ddf51df4126fd11358"
     },
     {
       "path": "src/near/relayHandler.test.ts",
@@ -613,10 +643,11 @@
     },
     {
       "path": "src/near/session.ts",
-      "bytes": 6274,
-      "sha256": "eada2379e6f6b7ad0ef991aa5e2ac3a716dd152598cd70007036e8b2c70afd69",
+      "bytes": 6658,
+      "sha256": "d50a41ed1f0046dcb2bd2403917ff0f5f9ffc25753b3584c185a5535bafa5c92",
       "source_sha256": "eada2379e6f6b7ad0ef991aa5e2ac3a716dd152598cd70007036e8b2c70afd69",
-      "disposition": "identical"
+      "disposition": "local-rules-withdrawal-or-submission-docs-candidate-update",
+      "published_080ed6_sha256": "eada2379e6f6b7ad0ef991aa5e2ac3a716dd152598cd70007036e8b2c70afd69"
     },
     {
       "path": "src/near/transfers.test.ts",
@@ -631,6 +662,20 @@
       "sha256": "e1c52e8666705a2ca5d42c40f927ceca2084e16339b40a21c4350e24410bff23",
       "source_sha256": "e1c52e8666705a2ca5d42c40f927ceca2084e16339b40a21c4350e24410bff23",
       "disposition": "identical"
+    },
+    {
+      "path": "src/near/withdrawal.test.ts",
+      "bytes": 11924,
+      "sha256": "e1e28621360121a41c434757a9769f3797e5962a4e788ee2f04c5bd336354cfd",
+      "source_sha256": null,
+      "disposition": "local-rules-withdrawal-candidate-addition"
+    },
+    {
+      "path": "src/near/withdrawalReceipt.ts",
+      "bytes": 4038,
+      "sha256": "bbb9a4d264adb32261108e9f04062a7bdd7ac094f799d647cd7d635ded40aa6d",
+      "source_sha256": null,
+      "disposition": "local-rules-withdrawal-candidate-addition"
     },
     {
       "path": "src/privy/bufferShim.ts",
@@ -696,6 +741,13 @@
       "disposition": "identical"
     },
     {
+      "path": "src/state/WithdrawalContext.tsx",
+      "bytes": 2662,
+      "sha256": "6fc361806241ca3abaa4810c58ca52503586b79a9ba6f076ce4a4dda2f05a437",
+      "source_sha256": null,
+      "disposition": "local-rules-withdrawal-candidate-addition"
+    },
+    {
       "path": "src/state/copy.ts",
       "bytes": 4688,
       "sha256": "b842b327f215b6a083b0e8c0d98d4c936d553db119e165d140f4ba29335a6514",
@@ -731,6 +783,20 @@
       "disposition": "identical"
     },
     {
+      "path": "src/state/rulesPreference.test.ts",
+      "bytes": 1615,
+      "sha256": "30df89a4efc6065e4de0c044ddff3bdcdae56f56a3df25d066f65406b3ad7574",
+      "source_sha256": null,
+      "disposition": "local-rules-withdrawal-candidate-addition"
+    },
+    {
+      "path": "src/state/rulesPreference.ts",
+      "bytes": 531,
+      "sha256": "8a77e7449720453fd6f59dc2156466fcb6b1bc3f8fac40592610b1f5aea646ad",
+      "source_sha256": null,
+      "disposition": "local-rules-withdrawal-candidate-addition"
+    },
+    {
       "path": "src/state/services.ts",
       "bytes": 2126,
       "sha256": "126ac1b408028bd1049af93d3ba0b41cf617250062997b9376b16e065efff35f",
@@ -745,12 +811,34 @@
       "disposition": "identical"
     },
     {
+      "path": "src/state/withdrawalFlow.test.ts",
+      "bytes": 9256,
+      "sha256": "063d6a166e25e5c2bad815a77788aa9aaff20df88c23082eb5b76ae7bf048e6d",
+      "source_sha256": null,
+      "disposition": "local-rules-withdrawal-candidate-addition"
+    },
+    {
+      "path": "src/state/withdrawalFlow.ts",
+      "bytes": 10116,
+      "sha256": "60ae9dfd29ed726efb4c7aa20081ceea911d35a0dfe17e05b1526c50f15cf370",
+      "source_sha256": null,
+      "disposition": "local-rules-withdrawal-candidate-addition"
+    },
+    {
       "path": "src/styles/app.css",
-      "bytes": 26862,
-      "sha256": "4620939877b51b2ccbbdc5e4518f040ab3da288f7d0ddfc9a87a64b7dd4e83d1",
+      "bytes": 27053,
+      "sha256": "7dfed72dc21469ed17d108ad67b63ff9845989c0a7cad75bcd4541ce1255f0b2",
       "source_sha256": "dc1764fd7be2552a31bcfe95a8c435177461be380fe4183f365800ce55d811e1",
-      "disposition": "reviewed-auth-ui-or-release-documentation-update",
-      "prior_release_sha256": "dc1764fd7be2552a31bcfe95a8c435177461be380fe4183f365800ce55d811e1"
+      "disposition": "local-rules-withdrawal-or-submission-docs-candidate-update",
+      "prior_release_sha256": "dc1764fd7be2552a31bcfe95a8c435177461be380fe4183f365800ce55d811e1",
+      "published_080ed6_sha256": "4620939877b51b2ccbbdc5e4518f040ab3da288f7d0ddfc9a87a64b7dd4e83d1"
+    },
+    {
+      "path": "src/styles/withdrawal.css",
+      "bytes": 534,
+      "sha256": "570385c4f59bb4b0fa622fb047a10f65790d5027cd6ef674a5b0c2b40ad75d21",
+      "source_sha256": null,
+      "disposition": "local-rules-withdrawal-candidate-addition"
     },
     {
       "path": "tsconfig.json",
@@ -767,5 +855,7 @@
       "disposition": "identical"
     }
   ],
-  "release_base": "b15a6f7b71e9eeb9332e04e1c315dd0b0422499f"
+  "release_base": "b15a6f7b71e9eeb9332e04e1c315dd0b0422499f",
+  "published_baseline": "080ed6fafb4cea6ea7e296cbd3611e18868cf1bc",
+  "current_candidate_status": "Uncommitted local successor; independent docs/publication review pending"
 }

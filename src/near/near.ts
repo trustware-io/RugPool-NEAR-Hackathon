@@ -317,6 +317,44 @@ export class Near {
     }
   }
 
+  /** Explicit external-wallet continuation only. Never used by automatic completion. */
+  captureWalletWithdrawal(accountId: string) {
+    if (this.pageAccount || this.pageSigner) throw Error('This account uses an email session. Sign in again explicitly rather than falling back to a full-access signer.')
+    const session = this.session
+    const contract = this.config.rugpool
+    const valid = () => !this.pageAccount && !this.pageSigner && this.session === session && this.config.rugpool === contract
+    return {
+      valid,
+      send: async (method: 'request_withdraw' | 'withdraw', args: Record<string, unknown>, guard: () => void): Promise<unknown> => {
+        const check = () => { guard(); if (!valid()) throw Error('Wallet identity changed.') }
+        check()
+        const wallet = await this.connector.wallet(); check()
+        const accounts = await wallet.getAccounts({ network: 'testnet' }); check()
+        if (accounts[0]?.accountId !== accountId) throw Error('Wallet account changed.')
+        return wallet.signAndSendTransaction({ network: 'testnet', receiverId: contract, actions: [{ type: 'FunctionCall', params: { methodName: method, args, gas: String((method === 'withdraw' ? 60 : 30) * 1e12), deposit: '0' } }] })
+      },
+    }
+  }
+
+  /** A captured capability for this one flow. Never renews, retries, or asks a wallet. */
+  captureWithdrawalSession(accountId: string) {
+    const session = this.session
+    const contract = this.config.rugpool
+    const url = this.config.relayerUrl
+    if (!session || session.accountId !== accountId || !url) throw Error('One-start withdrawal requires an existing relay session. External-wallet users must continue explicitly with their wallet.')
+    const valid = () => this.session === session && this.session.accountId === accountId && this.config.rugpool === contract && this.config.relayerUrl === url
+    return {
+      valid,
+      send: async (method: 'request_withdraw' | 'withdraw', args: Record<string, unknown>, guard: () => void): Promise<unknown> => {
+        const check = () => { guard(); if (!valid()) throw Error('Captured withdrawal session changed.') }
+        check()
+        const signed = await session.signer.sign(contract, method, args, method === 'withdraw' ? 60 : 30, check)
+        check()
+        return relay(url, signed)
+      },
+    }
+  }
+
   /**
    * Signs one function call with the connected wallet and returns the raw outcome. After
    * `signInWith`, the page's signer signs instead: the player's click on the action (say,

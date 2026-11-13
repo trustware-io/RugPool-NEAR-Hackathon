@@ -1,16 +1,26 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { money } from '../state/format'
 import { useGame } from '../state/GameContext'
 import { contractId, fastMode, mockControls } from '../state/services'
 import { Modal } from './modals/Modal'
+import { readRulesOptOut, writeRulesOptOut } from '../state/rulesPreference'
 
 export function Footer() {
   const { state } = useGame()
   const controls = mockControls
   const [bots, setBots] = useState(controls?.botsOn() ?? false)
-  const [rulesOpen, setRulesOpen] = useState(false)
+  const [dontShowAgain, setDontShowAgain] = useState(readRulesOptOut)
+  const [rulesOpen, setRulesOpen] = useState(() => !dontShowAgain)
+  const [preferenceError, setPreferenceError] = useState(false)
+  const footer = useRef<HTMLElement>(null)
   const rulesOpener = useRef<HTMLButtonElement>(null)
   const wasRulesOpen = useRef(false)
+  useLayoutEffect(() => {
+    // Make the existing native dialog modal before the first interactive paint.
+    // Shell only mounts Footer once game state is ready; no actions exist while loading.
+    const dialog = footer.current?.querySelector<HTMLDialogElement>('dialog')
+    if (rulesOpen && dialog && !dialog.open) dialog.showModal()
+  }, [rulesOpen])
   useEffect(() => {
     // Conditional dialog removal can precede native focus restoration.
     if (wasRulesOpen.current && !rulesOpen) rulesOpener.current?.focus()
@@ -20,7 +30,7 @@ export function Footer() {
   const s = (ms: number) => (ms >= 60_000 && ms % 60_000 === 0 ? `${ms / 60_000} min` : `${ms / 1000}s`)
 
   return (
-    <footer className="foot" onKeyDown={(event) => {
+    <footer ref={footer} className="foot" onKeyDown={(event) => {
       const dialog = rulesOpen ? event.currentTarget.querySelector<HTMLDialogElement>('dialog:modal') : null
       if (dialog && ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End'].includes(event.key)) {
         event.preventDefault()
@@ -29,12 +39,16 @@ export function Footer() {
         else if (event.key === 'End') dialog.scrollTop = dialog.scrollHeight
         else dialog.scrollTop += ['ArrowUp', 'PageUp'].includes(event.key) ? -step : step
       }
-      if (rulesOpen && event.key === 'Tab') {
-        // Rules are read-only; Close is the only focusable dialog control.
-        const close = event.currentTarget.querySelector<HTMLButtonElement>('dialog:modal .x')
-        if (close) {
+      if (dialog && event.key === 'Tab') {
+        const controls = dialog.querySelectorAll<HTMLElement>('button, input')
+        const first = controls[0]
+        const last = controls[controls.length - 1]
+        if (event.shiftKey && document.activeElement === first) {
           event.preventDefault()
-          close.focus()
+          last?.focus()
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault()
+          first?.focus()
         }
       }
     }}>
@@ -52,6 +66,16 @@ export function Footer() {
           {rulesOpen && (
             <Modal title="Rules & instructions" onClose={() => setRulesOpen(false)}>
               <div className="rules-content">
+                <label className="rules-preference">
+                  <input type="checkbox" checked={dontShowAgain} onChange={(event) => {
+                    const next = event.currentTarget.checked
+                    const saved = writeRulesOptOut(next)
+                    setDontShowAgain(saved ? next : readRulesOptOut())
+                    setPreferenceError(!saved)
+                  }} />
+                  <span>Don’t show again <span className="muted small">on this browser</span></span>
+                </label>
+                {preferenceError && <p role="status">Could not save this preference. Your browser may show these rules again.</p>}
                 <p>Sign in, deposit funds, then join the Court before challenging. Review the current price before confirming a challenge. The last King standing wins the Jackpot when the round settles.</p>
                 <p className="muted small">{contractId ? 'Values below come from the connected game state.' : 'Mock mode: values below describe this local simulation, not a deployed game.'}</p>
                 <ul>

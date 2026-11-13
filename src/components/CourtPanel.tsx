@@ -3,11 +3,14 @@ import { useLoadedGame } from '../state/GameContext'
 import { useUi } from '../state/UiContext'
 import { contractId } from '../state/services'
 import { useAction } from '../state/useAction'
+import { useWithdrawal } from '../state/WithdrawalContext'
+import { WithdrawalStatus } from './WithdrawalStatus'
 
 export function CourtPanel() {
   const { state, account, me, now, store, connect } = useLoadedGame()
   const { open } = useUi()
   const { run, busy } = useAction()
+  const withdrawal = useWithdrawal()
   const c = state.court
   const earned = account ? Number(account.court_earned) + Number(account.king_stream) : 0
   // The contract's claim also pays out the game balance (the build plan's dethroned-King credits).
@@ -72,7 +75,14 @@ export function CourtPanel() {
           <button type="button" className="btn-line" disabled={busy || claimable < 1} onClick={() => void run(() => store.claim(), contractId ? `Sent ${money(claimable)} to your wallet.` : `Claimed ${money(earned)} to your game balance.`)}>
             Claim
           </button>
-          {ready !== null && now >= ready ? (
+          {withdrawal.supported ? (
+            <>
+              {pending > 0 && <button type="button" className="btn-line" disabled={withdrawal.active || withdrawal.state.phase === 'unknown'} onClick={() => withdrawal.start()}>
+                Finish all pending Court withdrawals
+              </button>}
+              <button type="button" className="btn-line" disabled={withdrawal.active || withdrawal.state.phase === 'unknown' || !account || BigInt(account.court) <= 0n} onClick={() => open({ kind: 'withdraw' })}>Withdraw from Court</button>
+            </>
+          ) : ready !== null && now >= ready ? (
             <button type="button" className="btn-line" disabled={busy} onClick={() => void run(() => store.withdraw(), contractId ? 'Withdrawn to your wallet.' : 'Withdrawn to your game balance.')}>
               Withdraw now
             </button>
@@ -87,6 +97,13 @@ export function CourtPanel() {
           Connect to join the Court
         </button>
       )}
+      {withdrawal.supported && pending > 0 && <p className="small">Pending: {money(account!.withdraw_pending)} to {me}. {ready !== null && now < ready ? `Cooldown display: ${clock(ready - now)}. ` : ''}Finish authorizes all pending funds after chain-confirmed readiness while this page stays open; it does not request more from Court.</p>}
+      <WithdrawalStatus />
+      {withdrawal.supported && pending > 0 && <details>
+        <summary>External wallet continuation</summary>
+        <p>Finish all pending funds to {me} with an explicit wallet approval. This does not arm automatic completion or request more from Court.</p>
+        <button type="button" className="btn-line" disabled={withdrawal.active || withdrawal.state.phase === 'unknown'} onClick={() => withdrawal.start(undefined, false)}>Finish all pending — approve in external wallet</button>
+      </details>}
       <p className="muted small">You need {money(state.params.min_court)} in the Court to challenge and $5 to enter the weekly draw. Your Court deposit is refundable: request a withdrawal and it unlocks after a cooldown.</p>
     </section>
   )
