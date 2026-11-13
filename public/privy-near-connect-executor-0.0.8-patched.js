@@ -1,0 +1,194 @@
+// RugPool patch of @peerfolio/privy-near-connect 0.0.8's executor (dist/executor.js). Two
+// changes, both in requestWallet, marked "RugPool patch":
+// 1. Only messages from window.parent are handled. This executor runs in near-connect's
+//    sandboxed iframe; near-connect relays the sign page's messages from the parent page after
+//    checking their origin. Any other window holding a reference to this iframe (for example a
+//    site that opened RugPool) could post a forged RESULT straight in, and the original accepted
+//    any message carrying the channel tag.
+// 2. A RESULT must have the shape its request expects: sign-in results are accounts with a valid
+//    NEAR account id; everything else must be an object.
+
+// src/types.ts
+var CHANNEL_SOURCE = "privy-near-connect";
+var channelMsg = {
+  /**
+   * Builds a `READY` message.
+   * @returns A `READY` message.
+   */
+  ready: () => ({ source: CHANNEL_SOURCE, type: "READY" }),
+  /**
+   * Builds a `SIGN_REQUEST` message.
+   * @param payload - Signing payload.
+   * @returns A `SIGN_REQUEST` message.
+   */
+  signRequest: (payload) => ({
+    source: CHANNEL_SOURCE,
+    type: "SIGN_REQUEST",
+    payload
+  }),
+  /**
+   * Builds a `RESULT` message.
+   * @param result - Signing result.
+   * @returns A `RESULT` message.
+   */
+  result: (result) => ({
+    source: CHANNEL_SOURCE,
+    type: "RESULT",
+    result
+  }),
+  /**
+   * Builds an `ERROR` message.
+   * @param error - Structured signing error.
+   * @returns An `ERROR` message.
+   */
+  error: (error) => ({
+    source: CHANNEL_SOURCE,
+    type: "ERROR",
+    error
+  })
+};
+
+// src/log.ts
+function createLogger(prefix, enabled = false) {
+  return {
+    debug: (...args) => {
+      if (enabled) console.debug(prefix, ...args);
+    }
+  };
+}
+
+// src/executor.ts
+var LOG_PREFIX = "[privy-near-connect-executor]";
+var READY_TIMEOUT_MS = 3e4;
+var ACCOUNT_ID_STORAGE_KEY = "privy-near-connect:account-id";
+// RugPool patch: NEAR account ids (named or 64-hex implicit), per the protocol's rules.
+var ACCOUNT_ID = /^(?=.{2,64}$)(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/;
+function validResult(kind, result) {
+  if (kind === "signIn" || kind === "signInAndSignMessage") {
+    return Array.isArray(result) && result.length > 0 && result.every((a) => a && typeof a.accountId === "string" && ACCOUNT_ID.test(a.accountId));
+  }
+  return typeof result === "object" && result !== null;
+}
+function requestWallet(metadata, payload) {
+  const { signPageURL, debug = false } = metadata;
+  const logger = createLogger(LOG_PREFIX, debug);
+  return new Promise((resolve, reject) => {
+    const popup = window.selector.open(signPageURL);
+    const cleanup = () => {
+      window.removeEventListener("message", handler);
+      clearInterval(closedPoll);
+      clearTimeout(readyTimeoutId);
+    };
+    const readyTimeoutId = setTimeout(() => {
+      cleanup();
+      popup.close();
+      reject(new Error(`Timed out waiting for READY message after ${READY_TIMEOUT_MS}ms`));
+    }, READY_TIMEOUT_MS);
+    const handler = (event) => {
+      // RugPool patch: only near-connect's relay from the parent page.
+      if (event.source !== window.parent) return;
+      const msg = event.data;
+      if (!msg || msg.source !== CHANNEL_SOURCE) return;
+      logger.debug("Received message from sign page", event.data);
+      if (msg.type === "READY") {
+        clearTimeout(readyTimeoutId);
+        logger.debug("Sending SIGN_REQUEST", payload);
+        popup.postMessage(channelMsg.signRequest(payload));
+      } else if (msg.type === "RESULT") {
+        cleanup();
+        // RugPool patch: refuse a result that doesn't fit the request.
+        if (!validResult(payload.kind, msg.result)) {
+          popup.close();
+          reject(new Error("Privy Sign returned a malformed result"));
+          return;
+        }
+        resolve(msg.result);
+      } else if (msg.type === "ERROR") {
+        cleanup();
+        reject(
+          Object.assign(new Error(msg.error.message), {
+            name: msg.error.type,
+            type: msg.error.type,
+            payload: msg.error.payload
+          })
+        );
+      }
+    };
+    const closedPoll = setInterval(() => {
+      if (popup.closed) {
+        cleanup();
+        reject(new Error("Privy Sign window closed"));
+      }
+    }, 300);
+    window.addEventListener("message", handler);
+    popup.windowIdPromise.then((windowId) => {
+      if (!windowId) {
+        cleanup();
+        window.dispatchEvent(new Event("popup-blocked"));
+        reject(new Error("Popup blocked by the browser"));
+      }
+    });
+  });
+}
+var wallet = {
+  manifest: {},
+  async signIn(data) {
+    const accounts = await requestWallet(this.manifest.metadata, {
+      kind: "signIn",
+      ...data
+    });
+    const accountId = accounts[0]?.accountId;
+    if (accountId) {
+      await window.selector.storage.set(ACCOUNT_ID_STORAGE_KEY, accountId);
+    }
+    return accounts;
+  },
+  async signInAndSignMessage(data) {
+    const accounts = await requestWallet(this.manifest.metadata, {
+      kind: "signInAndSignMessage",
+      ...data
+    });
+    const accountId = accounts[0]?.accountId;
+    if (accountId) {
+      await window.selector.storage.set(ACCOUNT_ID_STORAGE_KEY, accountId);
+    }
+    return accounts;
+  },
+  async signOut(_data) {
+    createLogger(LOG_PREFIX, this.manifest.metadata.debug).debug("signOut");
+    await window.selector.storage.remove(ACCOUNT_ID_STORAGE_KEY);
+  },
+  async getAccounts(_data) {
+    const accountId = await window.selector.storage.get(ACCOUNT_ID_STORAGE_KEY);
+    if (!accountId) return [];
+    return [
+      {
+        accountId
+      }
+    ];
+  },
+  async signMessage(params) {
+    return requestWallet(this.manifest.metadata, { kind: "signMessage", ...params });
+  },
+  async signAndSendTransaction(params) {
+    return requestWallet(this.manifest.metadata, {
+      kind: "signAndSendTransaction",
+      ...params
+    });
+  },
+  async signAndSendTransactions(params) {
+    return requestWallet(this.manifest.metadata, {
+      kind: "signAndSendTransactions",
+      ...params
+    });
+  },
+  async signDelegateActions(params) {
+    return requestWallet(this.manifest.metadata, {
+      kind: "signDelegateActions",
+      ...params
+    });
+  }
+};
+window.selector.ready(wallet);
+//# sourceMappingURL=executor.js.map
+//# sourceMappingURL=executor.js.map

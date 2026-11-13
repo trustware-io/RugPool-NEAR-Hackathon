@@ -1,0 +1,27 @@
+node_modules
+dist
+*.log
+.DS_Store
+*.tsbuildinfo
+*.local
+
+# Local NEAR chain (contract/rugpool/examples/localnet.rs): manifest and sandbox keys
+.localnet/
+.relayer/
+
+# Release hygiene: configuration, credentials and generated artifacts stay local.
+.env
+.env.*
+!.env.example
+.near-credentials/
+*.pem
+*.key
+credentials.json
+wallet.json
+__pycache__/
+.pytest_cache/
+coverage/
+target/
+*.wasm
+.vercel/
+.netlify/
