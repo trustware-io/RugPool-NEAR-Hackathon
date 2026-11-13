@@ -4,11 +4,9 @@ A king-of-the-hill game on NEAR. Players pay a rising price to take the throne, 
 
 Built at NEAR HACKATHON for the `games` track.
 
-Source release packaged 12 November 2026 from the existing November project. See [RELEASE.md](RELEASE.md).
+Start with the [browser simulation](#1-the-game-on-mocks-no-chain). For recorded testnet results and build instructions, see [RELEASE.md](RELEASE.md).
 
 ## Status
-
-Read this first. It says what works and where.
 
 | Part | State |
 |---|---|
@@ -44,9 +42,9 @@ Read this first. It says what works and where.
 
 ## Try it
 
-Use Node 24 and npm with the included lockfile. Local-chain steps also need Rust 1.93.0 and the wasm32-unknown-unknown target; see [reproduction prerequisites](RELEASE.md#reproduction-instructions-not-executed-in-packaging). Python 3.9+ is needed for keeper checks. Prior chain tooling used NEAR sandbox 2.13.4 and cargo-near 0.23.0. Initial dependency/tool provisioning needs network access; some contract integration tests also retrieve public drand data.
+Use Node 24 and npm with the included lockfile. Local-chain steps also need Rust 1.93.0 and the wasm32-unknown-unknown target; see [reproduction prerequisites](RELEASE.md#reproduction-instructions). Python 3.9+ is needed for keeper checks. Prior chain tooling used NEAR sandbox 2.13.4 and cargo-near 0.23.0. Initial dependency/tool provisioning needs network access; some contract integration tests also retrieve public drand data.
 
-### 1. The game on mocks (2 minutes, no chain)
+### 1. The game on mocks (no chain)
 
 Run these commands from the repository root. The browser-only simulation needs no Privy setup, relayer or funded account.
 
@@ -73,7 +71,7 @@ Everything in this mode is simulated in the browser, including the deposit. The 
 
 Mock balances, deposits, bots, yield and payouts are simulated. Mock Claim/withdrawal credits internal game balance, not an external wallet; it is not payout or NEAR Intents evidence.
 
-### 2. The contract, relayer and money path on a local NEAR chain (about 5 minutes)
+### 2. The contract, relayer and money path on a local NEAR chain
 
 This runs the real contract on a real local NEAR node, with the real relayer in front of it. Use two terminals.
 
@@ -104,7 +102,7 @@ python3 -m unittest discover -s scripts -p 'test_keeper.py'
 cd contract && cargo test -p rugpool -p test-usdc
 ```
 
-Prior independent evidence includes 182 frontend tests, 44 keeper doctests, 10 keeper exit tests, 117 contract unit tests plus 2 test-token tests, selected local-chain regressions, 15 mutation detections, local E2E and four separately executed live-drand tests. These are separate recorded runs, not a newly executed aggregate suite. See RELEASE.md for scope and limits, including the later focused auth checks and integrated build. No tests or builds were run during the original source-packaging step; commands above are reproduction instructions, not authorization to run them in the current work session. Contract integration tests require a local NEAR sandbox, and some retrieve public drand data.
+Recorded test results and their scope are in [RELEASE.md](RELEASE.md). These commands reproduce the checks; the recorded results are separate runs, not a fresh aggregate suite. Contract integration tests require a local NEAR sandbox, and some retrieve public drand data.
 
 ### 4. Owner-operated release testnet (not a self-service judge demo)
 
@@ -175,18 +173,13 @@ The app shows these under **Risks and who you trust**, next to the rules.
 - The UI can lag at a zero countdown until refreshed state arrives. No functional timer change was made in the Half-speed visual work.
 - Wallet sign-in (without Privy) asks the wallet for the same restricted key, but a wallet may ignore the 1 yoctoNEAR allowance.
 
-## What was built in the hackathon window
+## Hackathon work and prior work
 
-This is a fresh source-only release of an existing October–November project, not a new November 1 project. The source README records the original first commit on 21 October 2026, after the announcement on 19 October. Dependencies and the patched executor have their own provenance and notices. The locally supplied organizer rules say code from October 19 counts (FAQ Q-001), a new repository is not required (Q-003), testnet is eligible (Q-010), and no integration is mandatory (Q-011). The live rules were not refreshed during this offline packaging stage.
+This repository publishes an existing project whose recorded first commit was October 21, 2026. Work includes the game contract, app, relayer and local chain, followed by identity/session authorization, activation-payment recovery, storage safeguards, payout records, keeper monitoring and risk disclosures. Publication in a new repository does not establish new authorship or a new development start date.
 
-- **21 to 29 October:** the contract, the app, the relayer and the local chain, built milestone by milestone. Original history and the rehearsal log remain preserved in the original project, outside this release package.
-- **7 to 10 November:** identity binding for activation, relayed deposits and sign-in, session-key expiry, the trusted-relayer check, safe re-sending of activation payments, the storage buffer, payout records, the keeper's monitor, and the risk disclosures.
+The [organizer rules](https://nearhackathon.com/HACKATHON.md), checked November 13, allow code from October 19 (Q-001). Q-003 calls for a dedicated branch or pre-hackathon/submission tags and a README diff link to distinguish prior work; Q-005 permits disclosed libraries and AI code. Testnet is eligible (Q-010), and named integrations are optional (Q-011).
 
-Original repository: <https://github.com/hlassige/rugpool-app> (private preservation repository; not a public judge-accessible history link). See PROVENANCE.md for the exact candidate base and packaging boundary.
-
-Earlier planning drafts and original history are preserved outside this source release. Development began in October; publication in a fresh repository does not change that provenance.
-
-The source-only packaging manifest establishes copied-file provenance, not a publicly inspectable development-window diff. The original development history remains private; this release does not yet supply the public baseline/window comparison described in Q-003. The recorded October 21 start lies inside Q-001's October 19 eligibility window, but the absence of earlier first-party baseline work has not been independently established by this public package.
+This release does not yet provide the public baseline/window comparison described in Q-003. Its file-hash manifest is not a development-history diff, and the absence of earlier first-party work has not been independently established by this public package. That evidence gap remains unresolved. Third-party dependencies and AI assistance are listed below.
 
 ## Libraries and AI use
 
@@ -214,7 +207,8 @@ The source-only packaging manifest establishes copied-file provenance, not a pub
 | `scripts/relayer.ts` | The relayer service |
 | `scripts/keeper.py` | The keeper and solvency monitor |
 | `scripts/e2e-slice.ts` | The end-to-end run from step 2 |
-| `PROVENANCE.md`, `RELEASE.md` | Source provenance, release status and reproducible build instructions |
+| `RELEASE.md` | Release status, evidence limits and build instructions |
+| `RELEASE_MANIFEST.json` | File sizes and SHA-256 hashes; excludes itself |
 
 ## License
 

@@ -3,7 +3,7 @@ name = "test-usdc"
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.93"
-repository = "https://github.com/hlassige/rugpool-app"
+repository = "https://github.com/trustware-io/RugPool-NEAR-Hackathon"
 
 [lib]
 crate-type = ["cdylib", "rlib"]

@@ -1,12 +1,12 @@
 # Release status and reproduction
 
-## Status, 2026-11-12
+## Published source and evidence scope
 
-Baseline `080ed6fafb4cea6ea7e296cbd3611e18868cf1bc` was published at `trustware-io/RugPool-NEAR-Hackathon` on November 12 following scoped independent review. Later automatic-rules and one-click withdrawal changes are a separate candidate and are not covered by that publication verdict. Fresh testnet deployment and a bounded single-player live walkthrough are complete to the evidence tier below. No public hosted demo, mainnet deployment or real Intents delivery is claimed. No tests, builds, installs, network access or signing were performed during the original source-packaging step; subsequent authorized deployment/live acceptance and integrated build are recorded separately, not retroactively attributed to packaging.
+Baseline `080ed6fafb4cea6ea7e296cbd3611e18868cf1bc` was published on November 12 following scoped independent review. The automatic-rules and Court withdrawal changes are now included in this public repository; their evidence scope is described below. The recorded testnet deployment and bounded single-player walkthrough predate that workflow. No public hosted demo, mainnet deployment or real Intents delivery is claimed.
 
-### Local successor candidate — November 13
+### Rules and withdrawal workflow
 
-The uncommitted successor adds automatic rules preferences and one-start Court withdrawal UI/controller with finalized-receipt and snapshot-freshness checks. Its 19-file code patch SHA-256 is `a53a2efc79a1f62834aa40e082f28a194a75a7ef469a4fb5f4987d493901ab6e`. Scoped independent code review and 51 focused tests passed; retained browser evidence passed rules/preference/keyboard checks and synthetic withdrawal lifecycle, reduced-motion and cooperating-tab checks. Withdrawal browser checks use authentic components with a synthetic adapter, not live payments. Narrow desktop-browser viewport coverage is not physical-mobile verification. The November 12 live payout evidence below does not test this newer workflow. Documentation and manifest corrections follow that code freeze; the combined candidate still awaits independent docs/publication review and is not published.
+The workflow adds automatic rules preferences and one-start Court withdrawal with finalized-receipt and snapshot-freshness checks. Recorded scoped independent code review and 51 focused tests passed, along with browser checks for rules/preferences, keyboard interaction, synthetic withdrawal lifecycle, reduced motion and cooperating tabs. Withdrawal browser checks use authentic components with a synthetic adapter, not live payments. Narrow desktop-browser viewport coverage is not physical-mobile verification. The November 12 live payout evidence below does not test this newer workflow.
 
 Prior independent evidence recorded November 11–12: frontend 182 tests/typecheck/build; 117 RugPool unit plus 2 token tests; keeper 44 doctests and 10 exit tests; selected local-chain regressions, 15 caught mutations and local-chain E2E; four separately run live-drand tests; scoped draw-storage review; nine synthetic keeper command-boundary cases. Local E2E substitutes identity and wallet keys, not live Privy/email. Gas at 500 depositors is extrapolated from 10/70, not an executed 500-player run.
 
@@ -14,7 +14,7 @@ Exact captured predecessor WASM `f0716ef483b121def3b31599c5fd940861a17f2336d9713
 
 The live pass used existing isolated role custody: keeper CLI legacy-keychain files and relayer JSON private_key from NEAR_CREDENTIALS_DIR, outside this repository. These interfaces are not interchangeable. Do not export or move keys to work around configuration without explicit approval. `keeper --once` can SEND; it is not a dry-run. Existing keeper comments/examples and application default accounts retain historical identifiers because logic is unchanged; use explicit approved release configuration, never run against old pool2 by accident.
 
-## Fresh deployment and bounded live acceptance — November 12 EST
+## Testnet deployment and bounded live acceptance (November 12 EST)
 
 Fresh pool `pool.rugpool-release-20261112.testnet` and token `tusdc.rugpool-release-20261112.testnet` were deployed with `new`, not an upgrade/migration. Both deployed binaries were independently downloaded and hash-matched at finalized block277452821:
 
@@ -23,7 +23,7 @@ Fresh pool `pool.rugpool-release-20261112.testnet` and token `tusdc.rugpool-rele
 | Pool | `5654b21d3fd65c2f98856da6cfa527119b8eb110ab8473531fbad800cef2d665` |
 | Test token | `0f798610daa79642b685f4adfa5dd31ca94a1ad3518a62fb3d8071aaedd0a042` |
 
-All16 retained contract source pins matched this release; pool lib SHA-256 `4311a56cc1eabc8c049b91a6bbeda255ce5fef722940b77a2bc3e89c04728ee4`. Authentic retained artifacts were used, not a new reproducibility build. Token is publicly mintable6-decimal tUSDC, not real USDC. Contracts retain account keys and are upgradeable. Intents configuration is null. Demo timings:60s withdrawal cooldown/showdown,15s snipe,180s backstop,10min draw interval; registration fee0, funded yield reserve0.
+At deployment, all 16 retained contract source pins matched the reviewed source tree; pool lib SHA-256 `4311a56cc1eabc8c049b91a6bbeda255ce5fef722940b77a2bc3e89c04728ee4`. Authentic retained artifacts were used, not a new reproducibility build. Token is publicly mintable6-decimal tUSDC, not real USDC. Contracts retain account keys and are upgradeable. Intents configuration is null. Demo timings:60s withdrawal cooldown/showdown,15s snipe,180s backstop,10min draw interval; registration fee0, funded yield reserve0.
 
 Deployment transactions (independently checked FINAL with successful receipts):
 - Token deploy/init: `6SKAoQ1XJygb8TGaRTBJkUFe3AF2dgQGyRzXCGJhxcoa`.
@@ -36,7 +36,7 @@ Human-operated email login/activation and Court30/Game10 deposits were followed 
 
 **Evidence limit:** claim and final withdrawal are confirmed by finalized balance/accounting effects, not recovered transaction hashes/receipts. The keeper receipt proves settlement only. Completed payout callbacks remove records; application event IDs are not transaction hashes. No private browser/log recovery or broad chain search was used. This accepts the bounded single-player path, not multiplayer, auto-defend, live draw, mainnet, Intents, Google login, upgrade compatibility or production readiness.
 
-Half-speed UI/rules were checked in actual built React with pointer/keyboard coverage; integrated contract-mode build passed (1547modules; dependency externalization and large-chunk warnings retained). Focused auth checks and independent auth review passed at pinned source. No broad historical suite was repeated for this candidate. Final documentation edits do not change the built code. Runtime was loopback frontend5181/relayer5187 with automatic expiry November12 23:12EST; it is not a permanently available judge URL. A separate demo video/public delivery and final submission remain outside this candidate.
+Half-speed UI/rules were checked in built React with pointer/keyboard coverage; the integrated contract-mode build passed (1547 modules, with dependency externalization and large-chunk warnings). Focused auth checks and independent auth review passed at pinned source. These are recorded checks, not a fresh run of the historical suite. The walkthrough used loopback frontend port 5181 and relayer port 5187 for a finite runtime window, not a permanently available judge URL. Demo delivery and final submission are separate from this testnet evidence.
 
 ## Unresolved dependency advisories
 
@@ -48,9 +48,9 @@ This unaudited testnet release retains three unresolved version-applicable advis
 
 Review scope: public baseline 080ed6, static dependency/source analysis, not exploit reproduction or final bundle/dead-code proof. Future dependency/source changes require a new disposition.
 
-## Reproduction instructions (not executed in packaging)
+## Reproduction instructions
 
-Use an isolated development environment with Node 24, npm compatible with the included lockfile, Rust 1.93.0 and wasm32-unknown-unknown target. Python 3.9+ is used for keeper checks. Prior contract tooling used NEAR sandbox 2.13.4 and cargo-near 0.23.0; dependency versions are in Cargo.lock. Provisioning tools/dependencies requires its own permission in the current agent session. No dependencies or binaries are vendored.
+Use an isolated development environment with Node 24, npm compatible with the included lockfile, Rust 1.93.0 and wasm32-unknown-unknown target. Python 3.9+ is used for keeper checks. Prior contract tooling used NEAR sandbox 2.13.4 and cargo-near 0.23.0; dependency versions are in Cargo.lock. Tool/dependency provisioning requires network access. No dependencies or binaries are vendored.
 
 From package root:
 
@@ -69,14 +69,10 @@ Locked contract release builds, from package root after authorized toolchain set
 RUSTFLAGS='-C link-arg=-s --cfg near' cargo +1.93.0 build --locked --manifest-path contract/Cargo.toml -p rugpool -p test-usdc --lib --target wasm32-unknown-unknown --release
 ```
 
-Expected output locations: `contract/target/wasm32-unknown-unknown/release/rugpool.wasm` and `test_usdc.wasm`. Record full SHA-256 and exact toolchain/flags before selecting any deployment artifact. These are reproducible instructions, not a claim of deterministic binary equivalence to an older deployment. Prefer a fresh output directory over any experiment cache. Never use generic cached WASM: a prior generic artifact was a fault-injected derivative.
+Expected output locations: `contract/target/wasm32-unknown-unknown/release/rugpool.wasm` and `contract/target/wasm32-unknown-unknown/release/test_usdc.wasm`. Record full SHA-256 and exact toolchain/flags before selecting any deployment artifact. These instructions do not establish deterministic binary equivalence to an older deployment. Use a fresh output directory; do not deploy unverified cached or fault-injected test artifacts.
 
-For test and local-chain instructions, see README.md. Use `cargo test --locked -p rugpool -p test-usdc` from contract/. Local-chain examples produce disposable `.localnet` keys and state; those are never release contents. Some integration tests need public beacon access. No further execution is authorized merely by documenting these commands.
+For test and local-chain instructions, see [README.md](README.md). Use `cargo test --locked -p rugpool -p test-usdc` from `contract/`. Local-chain examples produce disposable `.localnet` keys and state; keep them out of releases. Some integration tests need public beacon access.
 
-## Historical original release sequence (deployment/live walkthrough now superseded above)
+## Operator deployment safeguards
 
-1. Owner confirms repository owner/name and visibility, separate testnet accounts, signing custody, transaction/funding caps and hosting. No real-value or mainnet scope implied.
-2. Publish only this source tree after final local source/privacy review; preserve this provenance. Do not publish the surrounding packaging/evidence directory.
-3. Separately authorize dependency setup/build if needed; capture and approve exact release WASM hashes. Deploy new token/pool accounts, never upgrade existing pool2. Initialize `new`, not `migrate`, on a new pool, with owner-approved token, owner, timings, limits, relayers and no real Intents configuration.
-4. Configure explicitly approved new account IDs in private local configuration and public browser values, provision relayer/keeper custody through an approved backend, then configure hosting. Persistent relayer ledger and secrets stay out of Git/static hosting.
-5. Record deployment receipts/code hashes and truthful status. A login/gameplay acceptance walkthrough is further testing and needs fresh permission. Human supplies/publishes demo and confirms exact submission payload separately.
+Use separate testnet accounts, explicit funding/transaction limits and verified release WASM hashes. Initialize a fresh pool with `new`, not `migrate`; do not target the old pool2 defaults. Configure the token, owner, timings, limits and authorized relayers explicitly, with no real Intents configuration. Persistent relayer ledgers and signing credentials must stay outside Git and static hosting. Record deployment receipts and code hashes; deployment alone does not establish gameplay acceptance or authorize mainnet use.
