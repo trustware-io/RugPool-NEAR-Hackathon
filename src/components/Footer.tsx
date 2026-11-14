@@ -76,20 +76,16 @@ export function Footer() {
                   <span>Don’t show again <span className="muted small">on this browser</span></span>
                 </label>
                 {preferenceError && <p role="status">Could not save this preference. Your browser may show these rules again.</p>}
-                <p>Sign in, deposit funds, then join the Court before challenging. Review the current price before confirming a challenge. The last King standing wins the Jackpot when the round settles.</p>
-                <p className="muted small">{contractId ? 'Values below come from the connected game state.' : 'Mock mode: values below describe this local simulation, not a deployed game.'}</p>
+                <p>Take the throne. Be the last King at showdown’s end to win the Jackpot when the round settles.</p>
                 <ul>
-                  <li>The first challenge costs {money(p.start_price)}. Each challenge adds {p.step_bps / 100}%. The price resets every round.</li>
-                  <li>Every ticket splits {p.split_bps.map((b) => b / 100).join(' / ')}: Jackpot, the King you dethrone, the Court, the protocol.</li>
-                  <li>
-                    No early end. The current round's showdown threshold is {money(state.round.showdown_trigger)}; its age limit is {s(state.round.backstop_at - state.round.started_at)}. The showdown runs {s(p.showdown_ms)}; a challenge with less than {s(p.snipe_ms)} remaining extends the remaining time to {s(p.snipe_ms)}.
-                  </li>
-                  <li>Auto-defend retakes the throne for you in the same transaction, up to your max price, with at most 25 retakes per transaction.</li>
-                  <li>
-                    You need {money(p.min_court)} in the Court to challenge. Request a Court withdrawal, then wait until its displayed ready time before withdrawing. Eligible Court deposits enter the draw without spending Court principal. Yield depends on the funded reserve; fees depend on play. Funds remain exposed to contract, token, storage and operator risks.
-                  </li>
-                  <li>Challenge tickets are spent, not refundable Court deposits. Nothing promises a return. Read “Risks and who you trust” below before playing.</li>
+                  <li><strong>Fund both:</strong> Game balance buys tickets. Keep at least {money(p.min_court)} in the Court to challenge; tickets never spend Court principal.</li>
+                  <li><strong>Challenge:</strong> Check the price before confirming. Tickets start at {money(p.start_price)}, rise {p.step_bps / 100}% each challenge and reset each round.</li>
+                  <li><strong>Watch the clock:</strong> Late challenges reset the remaining showdown time to {s(p.snipe_ms)}.</li>
+                  <li><strong>Auto-defend:</strong> When dethroned, automatically buy back in within your per-ticket max and Game balance, while Court-eligible. Up to 25 retakes per transaction, not a total spending cap.</li>
+                  <li><strong>Court rewards:</strong> Fees depend on play; yield needs a funded reserve. Eligible deposits enter the draw without spending principal.</li>
+                  <li><strong>Withdraw Court:</strong> Start withdrawal, then wait for the displayed cooldown. Pending funds stop earning and no longer count toward eligibility.</li>
                 </ul>
+                <p className="muted small">Challenge tickets are spent and non-refundable; paid fees are not Court principal. No guaranteed returns. Contract, token, storage and operator risks apply. Read “Risks and who you trust” below.</p>
               </div>
             </Modal>
           )}

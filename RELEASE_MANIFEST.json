@@ -279,15 +279,15 @@
     },
     {
       "path": "src/components/Footer.test.tsx",
-      "bytes": 1516,
-      "sha256": "cd92a12162fda4eb2793f30a23bb200699baac9d1bb3b1f23ee29ab5a3b2268b",
+      "bytes": 2438,
+      "sha256": "8e3a2bfb7d4ed14cbd4a4474075118b38ea1592b7f23362b5d92b65b146e6695",
       "source_sha256": null,
       "disposition": "local-rules-withdrawal-candidate-addition"
     },
     {
       "path": "src/components/Footer.tsx",
-      "bytes": 9754,
-      "sha256": "e5b1b5e96e037db761f4fdcdb3e6ff0c1359a7b553c47ee5bd215a23b4b9e335",
+      "bytes": 9395,
+      "sha256": "d88939410666c980cbd0bcb7378549917733fb9bd9bea93192a895692e446db8",
       "source_sha256": "1366e2ff889ef22ef8278a2258da6ef783a18e4a41777285eeac722d03fbda45",
       "disposition": "local-rules-withdrawal-or-submission-docs-candidate-update",
       "prior_release_sha256": "1366e2ff889ef22ef8278a2258da6ef783a18e4a41777285eeac722d03fbda45",
