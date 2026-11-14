@@ -1,7 +1,7 @@
 {
   "format": 1,
   "candidate_base": "edbc4f03138c83cc28e7552ea0dcf9ac0363dd9d",
-  "scope": "Source-only release; manifest excludes itself",
+  "scope": "Source and demo media; manifest excludes itself",
   "files": [
     {
       "path": ".env.example",
@@ -27,8 +27,8 @@
 
     {
       "path": "README.md",
-      "bytes": 21827,
-      "sha256": "fcbd88c7c733c108140a21d0e6385e219e131686a6874436cd00f3987b20bde2",
+      "bytes": 22363,
+      "sha256": "75de5e8ef3c39cc8a242d097a072522da3179254d4b01e56dc81cbc34820e3a0",
       "source_sha256": "ce3fa3c89e8c748940b88ddc18e678addbbfb5a2c299f1e8470f0924ab74b6ee",
       "disposition": "judge-facing-documentation-cleanup",
       "prior_release_sha256": "aa8d8de3f6a78c59611c1dc8f6fa8587745af5ad7d01d2db8b8457e06ecb580a",
@@ -845,6 +845,20 @@
       "sha256": "baf2c6e87c5d2aede3b2685a050d500326d669c5d75cc85c4f65d3e0b3d75085",
       "source_sha256": "baf2c6e87c5d2aede3b2685a050d500326d669c5d75cc85c4f65d3e0b3d75085",
       "disposition": "identical"
+    },
+    {
+      "path": "media/RugPool-demo.mp4",
+      "bytes": 29709030,
+      "sha256": "aa38f4ebe94ab125015e344cc73016182e195702e1605930a3fabe2c343a9228",
+      "source_sha256": "aa38f4ebe94ab125015e344cc73016182e195702e1605930a3fabe2c343a9228",
+      "disposition": "user-approved-demo-media"
+    },
+    {
+      "path": "media/RugPool-trailer.mp4",
+      "bytes": 63041711,
+      "sha256": "44484c8697751ea93ea8bd9fe55efcca3c202aef7a098d6f840db14854f8e088",
+      "source_sha256": "44484c8697751ea93ea8bd9fe55efcca3c202aef7a098d6f840db14854f8e088",
+      "disposition": "user-approved-demo-media"
     }
   ],
   "release_base": "b15a6f7b71e9eeb9332e04e1c315dd0b0422499f",

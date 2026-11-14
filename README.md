@@ -6,6 +6,13 @@ Built at NEAR HACKATHON for the `games` track.
 
 Start with the [browser simulation](#1-the-game-on-mocks-no-chain). For recorded testnet results and build instructions, see [RELEASE.md](RELEASE.md).
 
+## Demo and trailer
+
+- [Watch the demo](media/RugPool-demo.mp4) ([download MP4](https://github.com/trustware-io/RugPool-NEAR-Hackathon/raw/refs/heads/main/media/RugPool-demo.mp4))
+- [Watch the trailer](media/RugPool-trailer.mp4) ([download MP4](https://github.com/trustware-io/RugPool-NEAR-Hackathon/raw/refs/heads/main/media/RugPool-trailer.mp4))
+
+Gameplay, deposits and displayed yields in these videos are simulated. The demo separately presents saved testnet evidence; it is not live transaction footage. NEAR Intents is not live.
+
 ## Status
 
 | Part | State |
