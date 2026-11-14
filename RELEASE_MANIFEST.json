@@ -27,8 +27,8 @@
 
     {
       "path": "README.md",
-      "bytes": 22363,
-      "sha256": "75de5e8ef3c39cc8a242d097a072522da3179254d4b01e56dc81cbc34820e3a0",
+      "bytes": 23924,
+      "sha256": "2d4eb08007208b47e6637c0cc9060a9634a63c167018e07d992d9180d7f00d36",
       "source_sha256": "ce3fa3c89e8c748940b88ddc18e678addbbfb5a2c299f1e8470f0924ab74b6ee",
       "disposition": "judge-facing-documentation-cleanup",
       "prior_release_sha256": "aa8d8de3f6a78c59611c1dc8f6fa8587745af5ad7d01d2db8b8457e06ecb580a",
@@ -36,8 +36,8 @@
     },
     {
       "path": "RELEASE.md",
-      "bytes": 10546,
-      "sha256": "920e707ce569b92a7845aeacc50581b3f13ebc59d3a197d3e8be0788ff7ccf33",
+      "bytes": 12753,
+      "sha256": "971aa0279afcf0266d6301decde8ec7034e6da6e664b9a87522d09cef2070afc",
       "source_sha256": null,
       "disposition": "judge-facing-documentation-cleanup",
       "prior_release_sha256": "44e783583e79d548a7c1f16f007b7e46f081815a734333a955d4de5dafe8d28e",

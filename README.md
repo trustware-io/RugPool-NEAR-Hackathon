@@ -1,12 +1,14 @@
 # RugPool
 
-A king-of-the-hill game on NEAR. Players pay a rising price to take the throne, and the last King standing when the clock runs out wins the Jackpot. To play, you keep a refundable deposit in the Court, which earns a share of every ticket and enters a weekly draw without spending your Court principal. Funds remain exposed to contract, token, storage and operator risks.
+Gamified yield on NEAR through a king-of-the-hill game. RugPool connects depositor rewards to competitive gameplay, with email login and relayer-paid actions to reduce wallet and gas friction. Players pay a rising price to take the throne, and the last King standing when the clock runs out wins the Jackpot. Court depositors can share ticket revenue and enter a weekly draw without buying challenge tickets or spending their Court principal in the draw. Additional yield comes from a separately funded reserve, not lending or staking; it stops when the reserve runs out. Funds remain exposed to contract, token, storage and operator risks.
 
-Built at NEAR HACKATHON for the `games` track.
+Built at NEAR HACKATHON for **Games With Real Economies** (`games`): a rising-price challenge loop, shared ticket revenue and social login. Testnet prototype; no mainnet deployment or live NEAR Intents integration.
 
-Start with the [browser simulation](#1-the-game-on-mocks-no-chain). For recorded testnet results and build instructions, see [RELEASE.md](RELEASE.md).
+Start with the [browser simulation](#1-the-game-on-mocks-no-chain): Node 24, `npm ci`, then `VITE_STORE=mock npm run dev`. It needs no wallet, credentials or funds. Follow the deposit-to-challenge steps below; everything in this mode is simulated. For recorded testnet results and build instructions, see [RELEASE.md](RELEASE.md).
 
 ## Demo and trailer
+
+[Hackathon submission post by Jesse](https://x.com/Jesse_TrustWare/status/2121728957045444895).
 
 - [Watch the demo](media/RugPool-demo.mp4) ([download MP4](https://github.com/trustware-io/RugPool-NEAR-Hackathon/raw/refs/heads/main/media/RugPool-demo.mp4))
 - [Watch the trailer](media/RugPool-trailer.mp4) ([download MP4](https://github.com/trustware-io/RugPool-NEAR-Hackathon/raw/refs/heads/main/media/RugPool-trailer.mp4))
@@ -26,6 +28,18 @@ Gameplay, deposits and displayed yields in these videos are simulated. The demo 
 | NEAR Intents deposits | Designed for, not live. See [NEAR Intents](#near-intents). |
 | Hosted demo | None. |
 | Audit | None. The contract is unaudited. |
+
+## Verify the features
+
+| Feature | Source and checks |
+|---|---|
+| Rising-price throne challenges, ticket split and settlement | [`challenge`, `split_ticket`, `settle_round` and unit tests](contract/rugpool/src/lib.rs); [local-chain gameplay tests](contract/rugpool/tests/independent_m3.rs). |
+| Court rewards and withdrawals | [`join_court`, `request_withdraw`, `withdraw` and accounting](contract/rugpool/src/lib.rs); [Court tests](contract/rugpool/tests/independent_m6.rs) and [reserve-funded yield tests](contract/rugpool/tests/independent_m8.rs). |
+| Verifiable draw randomness | [`close_draw` and `finalize_draw`](contract/rugpool/src/lib.rs) freeze entries and verify the future beacon; [drand verifier](contract/rugpool/src/drand.rs) uses NEAR BLS12-381 host functions. |
+| Restricted session keys and relayer-paid actions | [NEP-366 relay policy](src/near/relayPolicy.ts), [session tests](src/near/session.test.ts) and [sign-in tests](src/near/near.signin.test.ts). |
+| Separately exercised NEAR testnet path | [Deployed accounts, WASM hashes, transaction IDs and final accounting snapshot](RELEASE.md#testnet-deployment-and-bounded-live-acceptance-november-12-est). This is a bounded single-player result, not the simulated video or a live draw. |
+
+[Test commands](#3-the-test-suites) are below. [RELEASE.md](RELEASE.md) separates recorded checks from untested paths; linking a test is not a claim that it was rerun for this documentation update.
 
 ## How the game works
 
@@ -168,23 +182,23 @@ The app shows these under **Risks and who you trust**, next to the rules.
 
 ## Known gaps
 
-- Three unresolved dependency advisories remain; see [versions, severities and reachability limits](RELEASE.md#unresolved-dependency-advisories). No production-security clearance is claimed.
-- The relayer is one process with its ledger in local files. It was run only on loopback for bounded acceptance, not publicly hosted; its per-address limits are in memory.
-- One bounded keeper settlement was sent and verified FINAL. Continuous operation, draw execution and monitor alert delivery were not accepted by that pass.
-- The older callback path, kept for payouts in flight during an upgrade, trusts any call from the contract's own account. The plan is that no full-access key remains on that account after the upgrade. That has not been set up or checked.
-- The old testnet code hash was captured. An offline populated representative fixture under those exact bytes atomically upgraded and migrated to the authentic current artifact successfully. This is not a migration of live pool state, source/build attribution, or a deployment of this package.
-- Local-chain failed token-transfer/retry and fault-injected current callback recovery evidence exists. A legacy callback already in flight across an upgrade remains unverified. Fresh deployment and single-player live acceptance do not establish upgrade safety or full production acceptance.
-- A frozen draw may require a native NEAR top-up to finalize if storage headroom is exhausted. No funding-free liveness guarantee is made. The 500-player gas figure in the unchanged keeper comment is an extrapolation from 10/70-depositor measurements, not a 500-player execution.
-- The draw walks every depositor, which is why it holds 500 entrants.
-- Google sign-in through Privy has not been tried. Human email sign-in was used in the November12 release walkthrough. Historical automated local E2E still uses synthetic identity/wallet keys; it is separate evidence.
-- The UI can lag at a zero countdown until refreshed state arrives. No functional timer change was made in the Half-speed visual work.
-- Wallet sign-in (without Privy) asks the wallet for the same restricted key, but a wallet may ignore the 1 yoctoNEAR allowance.
+- **Security:** unaudited, upgradeable contracts and three unresolved dependency advisories. No production or real-funds clearance.
+- **Operations:** the relayer was exercised on loopback only, with a local-file ledger and in-memory limits. One keeper settlement was verified; continuous operation, live draws and alert delivery remain unverified.
+- **Upgrades:** live-state migration and in-flight legacy callbacks remain unverified; the older callback path trusts the contract's own account, whose full-access-key removal is unconfirmed.
+- **Draw scale:** capped at 500 entrants; gas at that scale is extrapolated, and finalization can require a native NEAR storage top-up.
+- **UX:** email login was exercised, Google login was not. Countdown refresh can lag; external wallets may ignore the requested session-key allowance.
+
+[Full limitations and evidence boundaries](RELEASE.md#detailed-implementation-limitations), including [dependency versions, severities and reachability](RELEASE.md#unresolved-dependency-advisories).
 
 ## Hackathon work and prior work
 
+RugPool is the team's only submission to this hackathon; no team member has submitted another project.
+
 This repository publishes an existing project whose recorded first commit was October 21, 2026. Work includes the game contract, app, relayer and local chain, followed by identity/session authorization, activation-payment recovery, storage safeguards, payout records, keeper monitoring and risk disclosures. Publication in a new repository does not establish new authorship or a new development start date.
 
-The [organizer rules](https://nearhackathon.com/HACKATHON.md), checked November 13, allow code from October 19 (Q-001). Q-003 calls for a dedicated branch or pre-hackathon/submission tags and a README diff link to distinguish prior work; Q-005 permits disclosed libraries and AI code. Testnet is eligible (Q-010), and named integrations are optional (Q-011).
+The [organizer rules](https://nearhackathon.com/HACKATHON.md), checked November 14, allow code from October 19 (Q-001). Q-003 calls for a dedicated branch or pre-hackathon/submission tags and a README diff link to distinguish prior work; Q-005 permits disclosed libraries and AI code. Testnet is eligible (Q-010), and named integrations are optional (Q-011).
+
+[Compare the first public release with the November 14 media release](https://github.com/trustware-io/RugPool-NEAR-Hackathon/compare/080ed6fafb4cea6ea7e296cbd3611e18868cf1bc...553ce81d73c72b73e40c6ffee6f88ae31fd109e9). This immutable comparison covers seven public release commits, including rules/withdrawal changes and documentation/media. It does not cover the original development window or establish a pre-hackathon baseline.
 
 This release does not yet provide the public baseline/window comparison described in Q-003. Its file-hash manifest is not a development-history diff, and the absence of earlier first-party work has not been independently established by this public package. That evidence gap remains unresolved. Third-party dependencies and AI assistance are listed below.
 

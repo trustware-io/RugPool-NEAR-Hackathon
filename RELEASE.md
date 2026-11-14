@@ -48,6 +48,20 @@ This unaudited testnet release retains three unresolved version-applicable advis
 
 Review scope: public baseline 080ed6, static dependency/source analysis, not exploit reproduction or final bundle/dead-code proof. Future dependency/source changes require a new disposition.
 
+## Detailed implementation limitations
+
+- Three unresolved dependency advisories remain; see [versions, severities and reachability limits](#unresolved-dependency-advisories). No production-security clearance is claimed.
+- The relayer is one process with its ledger in local files. It was run only on loopback for bounded acceptance, not publicly hosted; its per-address limits are in memory.
+- One bounded keeper settlement was sent and verified FINAL. Continuous operation, draw execution and monitor alert delivery were not accepted by that pass.
+- The older callback path, kept for payouts in flight during an upgrade, trusts any call from the contract's own account. The plan is that no full-access key remains on that account after the upgrade. That has not been set up or checked.
+- The old testnet code hash was captured. An offline populated representative fixture under those exact bytes atomically upgraded and migrated to the authentic current artifact successfully. This is not a migration of live pool state, source/build attribution, or a deployment of this package.
+- Local-chain failed token-transfer/retry and fault-injected current callback recovery evidence exists. A legacy callback already in flight across an upgrade remains unverified. Fresh deployment and single-player live acceptance do not establish upgrade safety or full production acceptance.
+- A frozen draw may require a native NEAR top-up to finalize if storage headroom is exhausted. No funding-free liveness guarantee is made. The 500-player gas figure in the unchanged keeper comment is an extrapolation from 10/70-depositor measurements, not a 500-player execution.
+- The draw walks every depositor, which is why it holds 500 entrants.
+- Google sign-in through Privy has not been tried. Human email sign-in was used in the November12 release walkthrough. Historical automated local E2E still uses synthetic identity/wallet keys; it is separate evidence.
+- The UI can lag at a zero countdown until refreshed state arrives. No functional timer change was made in the Half-speed visual work.
+- Wallet sign-in (without Privy) asks the wallet for the same restricted key, but a wallet may ignore the 1 yoctoNEAR allowance.
+
 ## Reproduction instructions
 
 Use an isolated development environment with Node 24, npm compatible with the included lockfile, Rust 1.93.0 and wasm32-unknown-unknown target. Python 3.9+ is used for keeper checks. Prior contract tooling used NEAR sandbox 2.13.4 and cargo-near 0.23.0; dependency versions are in Cargo.lock. Tool/dependency provisioning requires network access. No dependencies or binaries are vendored.
